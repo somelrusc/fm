@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FMAPP | Molins de Rei</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">
+            <i class="fa-solid fa-fire-flame-curved"></i>
+            <span>FM<strong>Molins</strong></span>
+        </div>
+        <div class="header-actions">
+            <button class="geo-status-pill" id="geo-pill" onclick="centerOnUser()">
+                <i class="fa-solid fa-location-crosshairs"></i> <span id="geo-text">Ubicació</span>
+            </button>
+            <button class="fav-header-btn" id="fav-filter-btn" onclick="toggleFavoritesFilter()">
+                <i class="fa-solid fa-heart"></i> <span id="fav-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="filter-bar" id="filter-bar">
+        <div class="select-wrapper">
+            <i class="fa-solid fa-calendar-day select-icon"></i>
+            <select id="day-select" onchange="onDayChange()">
+                <option value="now" selected>⚡ Està passant ara</option>
+                <option value="all">📅 Tots els actes</option>
+                <option value="divendres_18">Divendres 18 de Setembre</option>
+                <option value="dissabte_19">Dissabte 19 de Setembre</option>
+                <option value="diumenge_20">Diumenge 20 de Setembre</option>
+                <option value="dilluns_21">Dilluns 21 de Setembre</option>
+                <option value="dimarts_22">Dimarts 22 de Setembre</option>
+                <option value="dimecres_23">Dimecres 23 de Setembre</option>
+                <option value="dijous_24">Dijous 24 de Setembre</option>
+                <option value="divendres_25">Divendres 25 de Setembre</option>
+                <option value="dissabte_26">Dissabte 26 de Setembre</option>
+                <option value="diumenge_27">Diumenge 27 de Setembre</option>
+                <option value="dilluns_28">Dilluns 28 de Setembre</option>
+                <option value="dimarts_29">Dimarts 29 de Setembre</option>
+            </select>
+            <i class="fa-solid fa-chevron-down arrow-icon"></i>
+        </div>
+
+        <div class="feature-filters-scroll">
+            <button class="feature-chip" id="chip-acc" onclick="toggleFeatureFilter('acc')">
+                <i class="fa-solid fa-wheelchair"></i> PMR
+            </button>
+            <button class="feature-chip" id="chip-noFuego" onclick="toggleFeatureFilter('noFuego')">
+                <i class="fa-solid fa-fire-extinguisher"></i> Sense Pirotècnia
+            </button>
+            <button class="feature-chip" id="chip-noRuido" onclick="toggleFeatureFilter('noRuido')">
+                <i class="fa-solid fa-volume-xmark"></i> Sense Soroll
+            </button>
+            <button class="feature-chip" id="chip-noAglom" onclick="toggleFeatureFilter('noAglom')">
+                <i class="fa-solid fa-people-arrows"></i> Sense Aglomeracions
+            </button>
+            <button class="feature-chip" id="chip-familia" onclick="toggleFeatureFilter('familia')">
+                <i class="fa-solid fa-people-roof"></i> Familiar
+            </button>
+            <button class="feature-chip" id="chip-infantil" onclick="toggleFeatureFilter('infantil')">
+                <i class="fa-solid fa-child-reaching"></i> Infantil
+            </button>
+        </div>
+    </div>
+
+    <section id="view-map" class="app-view active">
+        <div id="map"></div>
+        <div class="bottom-sheet" id="bottom-sheet">
+            <div class="sheet-handle-area" onclick="toggleSheet()">
+                <div class="drag-handle"></div>
+                <div class="sheet-title-bar">
+                    <h3 id="sheet-status-title"><i class="fa-solid fa-map-location-dot"></i> Plànol d'Actes</h3>
+                    <span class="sheet-toggle-text" id="sheet-toggle-text">Desplegar <i class="fa-solid fa-chevron-up"></i></span>
+                </div>
+            </div>
+            <div class="sheet-content">
+                <div class="event-list" id="map-event-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-agenda" class="app-view">
+        <div class="view-header">
+            <h2>Programa d'Actes</h2>
+            <p>Tota la programació de la Festa Major organitzada per dies</p>
+        </div>
+        <div class="agenda-timeline" id="agenda-timeline"></div>
+    </section>
+
+    <section id="view-more" class="app-view">
+        <div class="view-header">
+            <h2>Serveis i Seguretat</h2>
+            <p>Punts d'atenció, emergències i informació</p>
+        </div>
+        <div class="services-list">
+            <div class="service-card lila-service-card" onclick="openLilaModalById('l1')">
+                <div class="service-icon-box lila-bg"><i class="fa-solid fa-hand"></i></div>
+                <div class="service-info">
+                    <h3>Punt Lila - Parc Baix Llobregat</h3>
+                    <p>Espai d'atenció, assessorament i acompanyament.</p>
+                    <span class="service-tag purple">Atenció i Prevenció</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+            <div class="service-card lila-service-card" onclick="openLilaModalById('l2')">
+                <div class="service-icon-box lila-bg"><i class="fa-solid fa-person-walking"></i></div>
+                <div class="service-info">
+                    <h3>Punt Lila Itinerant</h3>
+                    <p>Equip professional itinerant durant el correfoc i matines.</p>
+                    <span class="service-tag purple">Itinerant</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+            <div class="service-card police-service-card" onclick="openPoliceModal()">
+                <div class="service-icon-box police-bg"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="service-info">
+                    <h3>Guàrdia Urbana de Molins de Rei</h3>
+                    <p>Cos policial de proximitat i seguretat ciutadana 24h.</p>
+                    <span class="service-tag blue">Emergències 24h</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; padding: 16px; background-color: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; text-align: center;">
+            <i class="fa-solid fa-circle-info" style="font-size: 20px; color: #64748b; margin-bottom: 8px;"></i>
+            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0;">
+                Aquesta aplicació ha estat creada per <strong>el rusc</strong> sense ànim de lucre i no pretén substituir l'Ajuntament. És únicament una eina interactiva afegida per facilitar el filtratge d'actes i poder veure la programació en directe.
+            </p>
+        </div>
+    </section>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-map" onclick="switchTab('map')">
+            <i class="fa-solid fa-map-location-dot"></i><span>Mapa</span>
+        </button>
+        <button class="nav-item" id="nav-agenda" onclick="switchTab('agenda')">
+            <i class="fa-solid fa-calendar-days"></i><span>Agenda</span>
+        </button>
+        <button class="nav-item" id="nav-more" onclick="switchTab('more')">
+            <i class="fa-solid fa-shield-heart"></i><span>Serveis</span>
+        </button>
+    </nav>
+
+    <div class="modal-backdrop" id="event-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeModal('event-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div id="modal-dynamic-content">
+                <div class="modal-image-header" id="modal-image-header">
+                    <img id="modal-img" src="" alt="Event">
+                    <div id="modal-img-fallback" class="modal-img-fallback" style="display:none;"></div>
+                    <div class="modal-category-tag" id="modal-cat"></div>
+                </div>
+                <div class="modal-body" id="modal-body-content">
+                    <h2 id="modal-title"></h2>
+                    <p class="modal-organizer" id="modal-org" onclick="openOrgProfile(this.dataset.org)"></p>
+                    <div class="modal-info-grid">
+                        <div class="info-item">
+                            <i class="fa-solid fa-calendar"></i>
+                            <div><small>Data i Hora</small><span id="modal-date"></span></div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <div><small>Ubicació</small><span id="modal-place"></span><br><span id="modal-distance" style="color:var(--primary); font-size:11px;"></span></div>
+                        </div>
+                    </div>
+                    <div class="modal-badges-container" id="modal-badges"></div>
+                    <div class="modal-desc-box">
+                        <h4>Descripció</h4>
+                        <p id="modal-desc"></p>
+                    </div>
+                    <div class="modal-actions-row">
+                        <a href="#" target="_blank" class="modal-action-btn ticket-btn-action" id="modal-ticket-btn" style="display:none;">
+                            <i class="fa-solid fa-ticket"></i> Comprar Entrada
+                        </a>
+                        <button class="modal-action-btn fav-btn-action" id="modal-fav-btn">
+                            <i class="fa-solid fa-heart"></i> Preferits
+                        </button>
+                        <button class="modal-action-btn nav-btn-action" id="modal-nav-btn">
+                            <i class="fa-solid fa-map-pin"></i> Veure al Mapa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Perfil Organitzador -->
+    <div class="modal-backdrop" id="org-modal">
+        <div class="modal-card org-card">
+            <button class="modal-close-btn" onclick="closeModal('org-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="org-header">
+                <div class="org-avatar" id="org-avatar"></div>
+                <div class="org-info">
+                    <h2 id="org-name"></h2>
+                    <a id="org-ig" href="#" target="_blank" class="org-ig-btn" style="display:none;"><i class="fa-brands fa-instagram"></i> Seguir</a>
+                    <p id="org-desc"></p>
+                </div>
+            </div>
+            <div class="org-body">
+                <h3><i class="fa-solid fa-calendar-check"></i> Actes organitzats</h3>
+                <div class="event-list" id="org-events-list"></div>
+                <p class="beta-disclaimer">
+                    <i class="fa-solid fa-flask"></i> ATENCIÓ BETA: Aquesta funció de perfils està en fase de proves. Tots els perfils no detallats es mostren com a entitats organitzadores.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="lila-modal">
+        <div class="modal-card lila-card">
+            <button class="modal-close-btn" onclick="closeModal('lila-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="lila-hero" id="lila-hero-bg">
+                <div class="lila-icon-big"><i class="fa-solid fa-hand"></i></div>
+                <span class="lila-status-badge" id="lila-status">--</span>
+            </div>
+            <div class="modal-body">
+                <h2 id="lila-title">Punt Lila</h2>
+                <p class="lila-subtitle">Espai segur d'atenció i informació</p>
+                <div class="modal-info-grid">
+                    <div class="info-item" style="grid-column: span 2;">
+                        <i class="fa-solid fa-clock" style="color: var(--purple-lila);"></i>
+                        <div><small>Horari d'Obertura</small><div id="lila-schedule-list" class="mini-schedule"></div></div>
+                    </div>
+                    <div class="info-item" style="grid-column: span 2;">
+                        <i class="fa-solid fa-location-dot" style="color: var(--purple-lila);"></i>
+                        <div><small>Ubicació</small><span id="lila-location">--</span></div>
+                    </div>
+                </div>
+                <div class="service-details-box">
+                    <h4><i class="fa-solid fa-shield-heart" style="color:var(--purple-lila)"></i> Serveis i Atenció</h4>
+                    <ul class="service-list" id="lila-services"></ul>
+                </div>
+                <div class="modal-actions-row">
+                    <a href="tel:112" class="modal-action-btn lila-btn"><i class="fa-solid fa-phone"></i> Emergències 112</a>
+                    <button class="modal-action-btn lila-btn-secondary" id="lila-nav-btn"><i class="fa-solid fa-map-pin"></i> Mapa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="police-modal">
+        <div class="modal-card police-card">
+            <button class="modal-close-btn" onclick="closeModal('police-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="police-hero">
+                <div class="lila-icon-big"><i class="fa-solid fa-shield-halved"></i></div>
+                <span class="police-status-badge">● SERVEI 24 HORES</span>
+            </div>
+            <div class="modal-body">
+                <h2>Guàrdia Urbana de Molins de Rei</h2>
+                <p class="police-subtitle">Seguretat ciutadana i assistència immediata</p>
+                <div class="modal-actions-row" style="margin-top: 20px;">
+                    <a href="tel:936688866" class="modal-action-btn police-btn"><i class="fa-solid fa-phone-volume"></i> 936 68 88 66</a>
+                    <button class="modal-action-btn police-btn-secondary" id="police-nav-btn"><i class="fa-solid fa-map-pin"></i> Mapa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="events.js"></script>
+    <script src="business.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
