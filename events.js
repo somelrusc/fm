@@ -72,7 +72,8 @@ const actesData = [
     "org": "Foment Cultural i Artístic",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "Reconegut monologuista gadità que ha deixat marca al món de l’humor amb el seu estil únic i el seu enginy inigualable."
+    "desc": "Reconegut monologuista gadità que ha deixat marca al món de l’humor amb el seu estil únic i el seu enginy inigualable.",
+    "entrades": "https://www.giglon.com/todos?idEvent=miki-dkai-en-molins-de-rei-hoy-se-lia&directPurchase=true",
   },
    {
     "id": 5,
@@ -244,7 +245,8 @@ const actesData = [
     "org": "Museu del Renaixement",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "La visita, d’aproximadament una hora i mitja, recorre les sales del museu descobrint la història del Palau de Requesens, l’art del Renaixement i la vida quotidiana a l’època. Activitat gratuïta. Per participar-hi, és imprescindible fer reserva prèvia a info@museudelrenaixement.cat i rebre la corresponent confirmació. Per fer la reserva, indiqueu el vostre nom, número de persones, telèfon de contacte i codi postal."
+    "desc": "La visita, d’aproximadament una hora i mitja, recorre les sales del museu descobrint la història del Palau de Requesens, l’art del Renaixement i la vida quotidiana a l’època. Activitat gratuïta. Per participar-hi, és imprescindible fer reserva prèvia a info@museudelrenaixement.cat i rebre la corresponent confirmació. Per fer la reserva, indiqueu el vostre nom, número de persones, telèfon de contacte i codi postal.",
+    "rsvp": "mailto:info@museudelrenaixement.cat?subject=Visita%20Comentada%20al%20Museu%20del%20Renaixement&body=Bones%2C%0AM'agradaria%20reservar%20la%20visita%20comentada%20al%20Museu%20del%20Renaixement.%0ALes%20meves%20dades%20s%C3%B3n%3A%0ANom%3A%0AN%C3%BAmero%20de%20persones%3A%0ATel%C3%A8fon%20de%20contacte%3A%0ACodi%20Postal%3A%0A%0AEspero%20la%20vostra%20resposta%2C%0AAtentament%2C%0ANom%20i%20Cognoms",
   },
   {
     "id": 14,
@@ -396,7 +398,8 @@ const actesData = [
     "org": "Cine Club Hal 2002",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "https://www.cineclubhal2002.cat/wp-content/uploads/2026/08/les_musiciens-156383630-large.jpg",
-    "desc":"Astrid Thompson finalment aconsegueix fer realitat el somni del seu pare: reunir quatre Stradivarius per a un concert únic i molt esperat pels amants de la música de tot el món. Però els quatre virtuosos escollits per a l’ocasió no poden tocar junts i les crisis d’ego se succeeixen a mida que avancen amb els assajos. Desesperada, Astrid decideix anar a buscar l’únic que, al seu parer, encara pot salvar el concert: Charlie Beaumont, el compositor de la banda sonora."
+    "desc":"Astrid Thompson finalment aconsegueix fer realitat el somni del seu pare: reunir quatre Stradivarius per a un concert únic i molt esperat pels amants de la música de tot el món. Però els quatre virtuosos escollits per a l’ocasió no poden tocar junts i les crisis d’ego se succeeixen a mida que avancen amb els assajos. Desesperada, Astrid decideix anar a buscar l’únic que, al seu parer, encara pot salvar el concert: Charlie Beaumont, el compositor de la banda sonora.",
+    "entrades": "https://www.entrapolis.com/entrades/los-musicos-peni",
   },
   {
     "id": 22,
@@ -624,7 +627,8 @@ const actesData = [
     "org": "Foment Cultural i Artístic",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "Montserrat Martí presenta el recital d’òpera i sarsuela al costat del baríton zamorà Luis Santana acompanyats pel pianista Francesc Blanco."
+    "desc": "Montserrat Martí presenta el recital d’òpera i sarsuela al costat del baríton zamorà Luis Santana acompanyats pel pianista Francesc Blanco.",
+    "entrades": "https://www.entrapolis.com/entrades/montserrat-marti-caballe-recital-dopera-i-sarsuela",
   },
   {
     "id": 34,
@@ -769,9 +773,10 @@ const actesData = [
      "lat": 41.41333675323307,
     "lng":2.0146961178310985,
     "org": "Biblioteca el Molí i la Regidoria de Patrimoni",
-    "fuego": false, "ruido": true, "aglom": false, "acc": false, "familia": false, "infantil": false,
+    "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "La Biblioteca el Molí, antiga Fàbrica Ferrer i Mora. Un recorregut guiat per conèixer la història de l’antiga fàbrica a través dels espais de la Biblioteca. Places limitades. Inscripcions a partir del 7 de setembre. La inscripció només serà vàlida un cop hagi estat confirmada per la Biblioteca el Molí"
+    "desc": "La Biblioteca el Molí, antiga Fàbrica Ferrer i Mora. Un recorregut guiat per conèixer la història de l’antiga fàbrica a través dels espais de la Biblioteca. Places limitades. Inscripcions a partir del 7 de setembre. La inscripció només serà vàlida un cop hagi estat confirmada per la Biblioteca el Molí",
+     "rsvp": "https://www.molinsderei.site/bibliotecaelmoli/events/visita-patrimonial-la-biblioteca-el-moli-antiga-fabrica-ferrer-i-mora-34/",
   },
   {
     "id": 42,
@@ -789,7 +794,8 @@ const actesData = [
     "org": "Foment Cultural i Artístic",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "Homenatge íntim i emocional a l’obra d’un dels artistes més influents del pop en espanyol."
+    "desc": "Homenatge íntim i emocional a l’obra d’un dels artistes més influents del pop en espanyol.",
+    "entrades": "https://www.sokoentradas.com/espectaculo/6/tributo-alejandro-sanz-en-molins-de-rei.html",
   },
   {
     "id": 43,
@@ -939,7 +945,9 @@ const actesData = [
     "org": "Foment Cultural i Artístic",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "Coneguem el Foment per dins"
+    "desc": "Coneguem el Foment per dins",
+    "rsvp": "https://www.entrapolis.com/entrades/portes-obertes-del-foment",
+
   },
    {
     "id": 51,
@@ -1250,12 +1258,12 @@ const actesData = [
     "dataIso": "2026-09-27",
     "horaInici": "17:00",
     "horaFi": "19:30",
-    "categoria": "Cant",
+    "categoria": "Associació Enreda't",
     "icona": "fa-music",
      "color": "#04e640",
     "lat": 41.41125266679707,
     "lng": 2.015239624490672,
-    "org": "Enreda’t",
+    "org": "Associació Enreda’t",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
     "desc": "Discoteca inclusiva amb DJ Jambo Jambito. Una tarda de música, ball i diversió adreçada principalment a persones amb discapacitat intel·lectual, en un espai segur, adaptat i respectuós que afavoreix la socialització i la participació. Vine a gaudir de la Festa Major amb nosaltres!"
@@ -1333,7 +1341,8 @@ const actesData = [
     "org": "Foment Cultural i Artístic",
     "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
     "img": "",
-    "desc": "Espectacle d’humor, original i interactiu. Els actors surten a escena sense guió, i el públic decideix què passarà. Un xou diferent i únic en cada funció."
+    "desc": "Espectacle d’humor, original i interactiu. Els actors surten a escena sense guió, i el públic decideix què passarà. Un xou diferent i únic en cada funció.",
+     "rsvp": "https://www.entrapolis.com/entrades/improshow-foment-cultural-i-artistic-27092026",
   },
   {
     "id": 72,
