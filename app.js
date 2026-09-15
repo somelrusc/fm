@@ -420,12 +420,46 @@ document.addEventListener("DOMContentLoaded", () => {
         if (acte.infantil) badges += `<span class="badge badge-infantil"><i class="fa-solid fa-child-reaching"></i> Infantil</span> `;
         document.getElementById('modal-badges').innerHTML = badges;
 
+        // Disclaimers de Seguretat i Recomanacions
+        let disclaimersHtml = '';
+        if (acte.fuego) {
+            disclaimersHtml += `
+                <div class="disclaimer-chip fire-disclaimer" onclick="openFocModal()">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Pirotècnia: <u>Consulta les normes de seguretat</u></span>
+                </div>
+            `;
+        }
+        if (acte.ruido || acte.aglom) {
+            const msg = (acte.ruido && acte.aglom) ? 'Soroll i Aglomeracions' : (acte.ruido ? 'Soroll Elevat' : 'Aglomeracions');
+            disclaimersHtml += `
+                <div class="disclaimer-chip info-disclaimer" onclick="openRecomanacionsModal()">
+                    <i class="fa-solid fa-circle-info"></i> <span>${msg}: <u>Veure recomanacions</u></span>
+                </div>
+            `;
+        }
+        const disclaimersEl = document.getElementById('modal-disclaimers');
+        if (disclaimersEl) {
+            disclaimersEl.innerHTML = disclaimersHtml;
+            disclaimersEl.style.display = disclaimersHtml ? 'flex' : 'none';
+        }
+
+        // Botons Ticket / RSVP / Entrades
         const ticketBtn = document.getElementById('modal-ticket-btn');
-        if (acte.entrades) {
-            ticketBtn.href = acte.entrades;
+        const rsvpBtn = document.getElementById('modal-rsvp-btn');
+        
+        const ticketUrl = acte.ticket || acte.entrades;
+        if (ticketUrl && ticketUrl.trim() !== "") {
+            ticketBtn.href = ticketUrl;
             ticketBtn.style.display = 'flex';
         } else {
             ticketBtn.style.display = 'none';
+        }
+
+        if (acte.rsvp && acte.rsvp.trim() !== "") {
+            rsvpBtn.href = acte.rsvp;
+            rsvpBtn.style.display = 'flex';
+        } else {
+            rsvpBtn.style.display = 'none';
         }
 
         const favBtn = document.getElementById('modal-fav-btn');
@@ -546,6 +580,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.openPoliceModal = function() { document.getElementById('police-modal').classList.add('open'); };
     
+    // FUNCIONS PER OBRIR ELS NOUS MODALS DE SERVEIS
+    window.openFocModal = function() { document.getElementById('foc-modal').classList.add('open'); };
+    window.openRecomanacionsModal = function() { document.getElementById('recomanacions-modal').classList.add('open'); };
+    window.openBusModal = function() { document.getElementById('bus-modal').classList.add('open'); };
+
     window.closeModal = function(id) { 
         document.getElementById(id).classList.remove('open'); 
         if(id === 'event-modal') setTimeout(() => document.getElementById('modal-dynamic-content').innerHTML = defaultModalHtml, 300);
