@@ -1,3 +1,10 @@
+// Variable per emmagatzemar l'esdeveniment natiu d'instal·lació
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     let actes = actesData;
     let favorites = JSON.parse(localStorage.getItem('fmapp_favs') || '[]');
@@ -13,8 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const guardiaUrbana = { titol: "Guàrdia Urbana", lloc: "Carrer Josep Maria Llopis, 1", lat: 41.41177157926289, lng: 2.0160465752029455 };
 
     const map = L.map('map', { zoomControl: false }).setView([41.4136, 2.0163], 15);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-    const mapGroup = L.layerGroup().addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=cb1_2y94_1_3099e19ace5b1c182798b317', { maxZoom: 19 }).addTo(map);    const mapGroup = L.layerGroup().addTo(map);
     const lilaGroup = L.layerGroup().addTo(map);
 
     let userMarker = null;
@@ -589,6 +595,38 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(id).classList.remove('open'); 
         if(id === 'event-modal') setTimeout(() => document.getElementById('modal-dynamic-content').innerHTML = defaultModalHtml, 300);
     };
+
+    // FUNCIONS PEL MODAL D'INSTAL·LACIÓ NOU
+    window.closeInstallModal = function() {
+        document.getElementById('install-modal').classList.remove('open');
+    };
+
+    // Comprovem si és la primera vegada
+    const hasSeenInstallPrompt = localStorage.getItem('fmapp_install_prompt');
+    if (!hasSeenInstallPrompt) {
+        // Mostrem el modal uns segons després que carregui la pàgina
+        setTimeout(() => {
+            document.getElementById('install-modal').classList.add('open');
+            localStorage.setItem('fmapp_install_prompt', 'true');
+        }, 1500);
+    }
+
+    const installBtn = document.getElementById('install-app-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Trucada nativa d'instal·lació (Android/Chrome)
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                closeInstallModal();
+            } else {
+                // Alerta explicativa per Safari/iOS o usuaris sense PWA support
+                alert("Per afegir l'aplicació a la pantalla d'inici:\n\n- A iPhone (Safari): Toca la icona de compartir (quadrat amb fletxa) i selecciona 'Afegeix a la pantalla d'inici'.\n- A Android: Obre el menú del navegador i selecciona 'Afegeix a la pantalla d'inici'.");
+                closeInstallModal();
+            }
+        });
+    }
 
     window.centerOnUser = function() {
         if (userLatLng) map.flyTo(userLatLng, 17, {duration: 1.5});
