@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FMAPP | Molins de Rei</title>
+    <!-- Favicon afegit -->
+    <link rel="icon" href="icon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -100,6 +102,18 @@
             <p>Punts d'atenció, emergències i informació</p>
         </div>
         <div class="services-list">
+            
+            <!-- NOU SERVEI: INSTRUCCIONS D'INSTAL·LACIÓ AFEGIT -->
+            <div class="service-card" onclick="document.getElementById('install-modal').classList.add('open')">
+                <div class="service-icon-box" style="background: var(--primary);"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
+                <div class="service-info">
+                    <h3>Instal·lar l'App</h3>
+                    <p>Torna a veure les instruccions per afegir l'aplicació a la pantalla d'inici.</p>
+                    <span class="service-tag" style="background: #fce4ec; color: var(--primary);">App i Configuració</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+
             <div class="service-card lila-service-card" onclick="openLilaModalById('l1')">
                 <div class="service-icon-box lila-bg"><i class="fa-solid fa-hand"></i></div>
                 <div class="service-info">
