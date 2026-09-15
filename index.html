@@ -128,6 +128,39 @@
                 <i class="fa-solid fa-chevron-right arrow-more"></i>
             </div>
 
+            <!-- NOU SERVEI 1: NORMES DE SEGURETAT DELS ACTES DE FOC -->
+            <div class="service-card foc-service-card" onclick="openFocModal()">
+                <div class="service-icon-box fire-bg"><i class="fa-solid fa-fire"></i></div>
+                <div class="service-info">
+                    <h3>Normes de Seguretat dels Actes de Foc</h3>
+                    <p>Mesures obligatòries i recomanacions per al correfoc i cercaviles.</p>
+                    <span class="service-tag orange">Seguretat i Foc</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+
+            <!-- NOU SERVEI 2: RECOMANACIONS PIROTÈCNIA, SOROLL I AGLOMERACIONS -->
+            <div class="service-card recomanacions-service-card" onclick="openRecomanacionsModal()">
+                <div class="service-icon-box amber-bg"><i class="fa-solid fa-ear-listen"></i></div>
+                <div class="service-info">
+                    <h3>Recomanacions: Pirotècnia, Soroll i Aglomeracions</h3>
+                    <p>Guia i informació per a persones amb hipersensibilitat sensorial.</p>
+                    <span class="service-tag amber">Accessibilitat i Soroll</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+
+            <!-- NOU SERVEI 3: TRANSPORT PÚBLIC DURANT LA FESTA MAJOR -->
+            <div class="service-card bus-service-card" onclick="openBusModal()">
+                <div class="service-icon-box bus-bg"><i class="fa-solid fa-bus"></i></div>
+                <div class="service-info">
+                    <h3>Transport Públic durant la Festa Major</h3>
+                    <p>Informació de línies de bus urbà i mobilitat.</p>
+                    <span class="service-tag gray">Properament</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-more"></i>
+            </div>
+
             <div class="about-rusc-card" style="margin-top: 20px; padding: 16px; background: rgba(255, 255, 255, 0.85); border: 1px solid #e2e8f0; border-radius: 16px; font-size: 13px; color: #475569; line-height: 1.5;">
                 <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">
                     <i class="fa-solid fa-heart" style="color: #ec4899;"></i> Desenvolupat per El Rusc
@@ -172,6 +205,7 @@
                         </div>
                     </div>
                     <div class="modal-badges-container" id="modal-badges"></div>
+                    <div class="modal-disclaimers-container" id="modal-disclaimers"></div>
                     <div class="modal-desc-box">
                         <h4>Descripció</h4>
                         <p id="modal-desc"></p>
@@ -179,6 +213,9 @@
                     <div class="modal-actions-row">
                         <a href="#" target="_blank" class="modal-action-btn ticket-btn-action" id="modal-ticket-btn" style="display:none;">
                             <i class="fa-solid fa-ticket"></i> Comprar Entrada
+                        </a>
+                        <a href="#" target="_blank" class="modal-action-btn rsvp-btn-action" id="modal-rsvp-btn" style="display:none;">
+                            <i class="fa-solid fa-calendar-check"></i> Reservar
                         </a>
                         <button class="modal-action-btn fav-btn-action" id="modal-fav-btn">
                             <i class="fa-solid fa-heart"></i> Preferits
@@ -259,6 +296,94 @@
                 <div class="modal-actions-row" style="margin-top: 20px;">
                     <a href="tel:936688866" class="modal-action-btn police-btn"><i class="fa-solid fa-phone-volume"></i> 936 68 88 66</a>
                     <button class="modal-action-btn police-btn-secondary" id="police-nav-btn"><i class="fa-solid fa-map-pin"></i> Mapa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: NORMES DE SEGURETAT DELS ACTES DE FOC -->
+    <div class="modal-backdrop" id="foc-modal">
+        <div class="modal-card foc-card">
+            <button class="modal-close-btn" onclick="closeModal('foc-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="foc-hero">
+                <div class="lila-icon-big"><i class="fa-solid fa-fire"></i></div>
+                <span class="foc-status-badge">● NORMES DE SEGURETAT</span>
+            </div>
+            <div class="modal-body">
+                <h2>Normes de Seguretat dels Actes de Foc</h2>
+                <p class="foc-subtitle">Consells i mesures de seguretat per als correfocs i cercaviles de foc</p>
+                
+                <div class="service-details-box" style="margin-top: 0; margin-bottom: 16px;">
+                    <h4><i class="fa-solid fa-house" style="color: #ea580c;"></i> RECOMANACIONS ALS VEÏNS I VEÏNES</h4>
+                    <ul class="service-list">
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Per evitar accidents, traieu del carrer qualsevol obstacle que pugui destorbar el recorregut del correfoc: taules, testos amb plantes, cadires, etc.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Retireu els vehicles de la zona per on passarà el correfoc. Consulteu-ne els dies i els itineraris.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Tanqueu les portes, les finestres i els balcons. Baixeu les persianes i protegiu les obertures per tal d’impedir l’entrada de coets i guspires que puguin causar un incendi.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Recolliu la roba estesa o altres elements tèxtils com banderes, domassos o tendals per prevenir que es puguin encendre.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Protegiu amb cartró els vidres dels aparadors, portes i finestres per on passin les cercaviles de foc, inclosos els primers pisos.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>No envaïu l’espai on els grups de foc fan l’actuació i no agafeu ni destorbeu cap dels seus membres. Seguiu-ne les recomanacions.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>No es pot tirar aigua des dels balcons ni a sobre dels petards, ja que la pólvora és imprevisible.</span></li>
+                    </ul>
+                </div>
+
+                <div class="service-details-box" style="margin-top: 16px;">
+                    <h4><i class="fa-solid fa-user-shield" style="color: #ea580c;"></i> PARTICIPEU AMB SEGURETAT I RESPONSABILITAT</h4>
+                    <ul class="service-list">
+                        <li><i class="fa-solid fa-triangle-exclamation" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Per participar en els actes de foc, és obligatori portar roba gruixuda de cotó, coll tancat, màniga llarga, mocador al coll i calçat flexible, lleuger i tancat.</span></li>
+                        <li><i class="fa-solid fa-triangle-exclamation" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Sempre s’ha de córrer en la direcció de la bèstia. No se li ha d’obstruir mai el pas. No agafeu ni destorbeu cap dels seus membres.</span></li>
+                        <li><i class="fa-solid fa-ban" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Es prohibeix la participació i presència de gossos i altres animals de companyia.</span></li>
+                        <li><i class="fa-solid fa-ban" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Les persones amb mobilitat reduïda i els infants no han d’estar a les primeres fileres ni a les zones de foc. En qualsevol cas, els petits han d’anar acompanyats d’un adult i es prohibeix la participació i presència de cotxets d’infants.</span></li>
+                        <li><i class="fa-solid fa-triangle-exclamation" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Sigueu conscients que les activitats de foc comporten perills i riscos per als participants. No us acosteu a menys de 2 metres de les bèsties de foc i actueu amb seny i prudència.</span></li>
+                        <li><i class="fa-solid fa-shield" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>Els organitzadors vetllen constantment pel bon funcionament de les activitats i cal seguir les seves recomanacions durant el transcurs del correfoc.</span></li>
+                        <li><i class="fa-solid fa-circle-exclamation" style="color: #ea580c; flex-shrink: 0; margin-top: 3px;"></i> <span>El públic que participa en els actes del correfoc i el correcuita és el responsable primer i únic dels accidents que es puguin patir. No complir les normes de seguretat pot provocar accidents i cremades potencialment greus.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: RECOMANACIONS EN ELS ACTES AMB PIROTÈCNIA, SOROLL I AGLOMERACIONS -->
+    <div class="modal-backdrop" id="recomanacions-modal">
+        <div class="modal-card recomanacions-card">
+            <button class="modal-close-btn" onclick="closeModal('recomanacions-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="sensorial-hero">
+                <div class="lila-icon-big"><i class="fa-solid fa-ear-listen"></i></div>
+                <span class="sensorial-status-badge">● ACCESSIBILITAT I INCLUSIÓ</span>
+            </div>
+            <div class="modal-body">
+                <h2>Recomanacions: Pirotècnia, Soroll i Aglomeracions</h2>
+                <p class="foc-subtitle">Per a les persones amb hipersensibilitat sensorial</p>
+                <div class="service-details-box" style="margin-top: 0;">
+                    <h4><i class="fa-solid fa-heart" style="color: #d97706;"></i> CONSELLS I RECOMANACIONS</h4>
+                    <ul class="service-list">
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Anticipar verbalment, sempre que sigui possible, i si cal amb l’ús de suports visuals, l’esdeveniment: lloc de l’esdeveniment, tipus, què faran, qui hi haurà, com serà, el tipus de sons o sorolls (música, petards, aglomeració de gent, etc.) que podran sentir així com els moments on és previsible que es produeixin els sons més forts.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Als actes amb pirotècnia, en funció de les necessitats de la persona, mirar de trobar els llocs més allunyats, amplis i oberts possibles per tal d’evitar reverberacions i efectes d’amplificació o bé, espais amplis protegits, tancats; que amorteixen el so i que protegeixin de l’aglomeració.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Arribar un temps abans per tal de localitzar espais més adients: situar-se a prop de les sortides evitant la zona central de l’espai i lluny de les sortides de so (altaveus).</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Als actes a l’aire lliure, preveure la hidratació, ús de protecció pel cap, protecció solar per a la pell i protecció per als ulls.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Valorar la possibilitat de l’ús de protectors auditius (cascs), que rebaixin la pressió acústica o que siguin inhibidors del so.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Portar alguna joguina o objecte que, en un moment determinat, pugui facilitar la regulació.</span></li>
+                        <li><i class="fa-solid fa-check" style="color: #d97706; flex-shrink: 0; margin-top: 3px;"></i> <span>Estar acompanyat d’una persona de confiança.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: TRANSPORT PÚBLIC DURANT LA FESTA MAJOR -->
+    <div class="modal-backdrop" id="bus-modal">
+        <div class="modal-card bus-card">
+            <button class="modal-close-btn" onclick="closeModal('bus-modal')"><i class="fa-solid fa-xmark"></i></button>
+            <div class="bus-hero">
+                <div class="lila-icon-big"><i class="fa-solid fa-bus"></i></div>
+                <span class="bus-status-badge">● INFORMACIÓ DE SERVEI</span>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <h2>Transport Públic durant la Festa Major</h2>
+                <p class="foc-subtitle">BUS - Molins de Rei</p>
+                <div class="service-details-box" style="margin-top: 20px; padding: 24px;">
+                    <i class="fa-solid fa-clock" style="font-size: 36px; color: #0284c7; margin-bottom: 12px; display: block;"></i>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Properament</h3>
+                    <p style="font-size: 14px; color: #64748b; margin: 0;">La informació sobre horaris, afectacions i recorreguts del transport públic (BUS) durant la Festa Major estarà disponible properament.</p>
                 </div>
             </div>
         </div>
