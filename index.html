@@ -389,6 +389,27 @@
         </div>
     </div>
 
+    <!-- NOU MODAL: AFEGIR A LA PANTALLA D'INICI -->
+    <div class="modal-backdrop" id="install-modal">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeInstallModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="text-align: center; padding-top: 40px;">
+                <div style="font-size: 52px; color: var(--primary); margin-bottom: 16px;">
+                    <i class="fa-solid fa-arrow-down-to-bracket"></i>
+                </div>
+                <h2 style="justify-content: center;">Guarda l'App</h2>
+                <p style="font-size: 14px; color: var(--text-sub); margin-top: 8px; margin-bottom: 24px; line-height: 1.5;">
+                    Afegeix aquesta web a la teva pantalla d'inici per accedir-hi ràpidament com si fos una App nativa.<br><br><strong>No es descarregarà cap programari</strong>, simplement es guardarà un accés directe al teu dispositiu per funcionar molt més ràpid.
+                </p>
+                <div class="modal-actions-row">
+                    <button class="modal-action-btn" id="install-app-btn" style="background: var(--primary); color: white; width: 100%; flex-basis: 100%;">
+                        <i class="fa-solid fa-plus"></i> Afegir a la Pantalla d'Inici
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="events.js"></script>
     <script src="business.js"></script>
