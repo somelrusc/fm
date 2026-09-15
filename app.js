@@ -51,9 +51,30 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date(`${isoStr}T${timeStr}:00`);
     }
 
+    function isEventFinished(acte) {
+        const now = new Date();
+        const start = parseDateTime(acte.dataIso, acte.horaInici);
+        if (!acte.horaFi) {
+            const hoursSinceStart = (now - start) / (1000 * 60 * 60);
+            return hoursSinceStart >= 3;
+        }
+        const end = parseDateTime(acte.dataIso, acte.horaFi);
+        if (end < start) end.setDate(end.getDate() + 1);
+        return now > end;
+    }
+
     function getEventStatus(acte) {
         const now = new Date();
         const start = parseDateTime(acte.dataIso, acte.horaInici);
+        
+        if (!acte.horaFi) {
+            const diffMinsToStart = (start - now) / 60000;
+            const hoursSinceStart = (now - start) / (1000 * 60 * 60);
+            if (hoursSinceStart >= 0 && hoursSinceStart < 1) return 'now';
+            if (diffMinsToStart > 0 && diffMinsToStart <= 30) return 'soon';
+            return 'other';
+        }
+
         const end = parseDateTime(acte.dataIso, acte.horaFi);
         if (end < start) end.setDate(end.getDate() + 1);
 
@@ -104,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderCardHTML(acte, isLinked = false) {
         const status = getEventStatus(acte);
+        const isFinished = isEventFinished(acte);
         const distTag = getDistanceTag(acte.lat, acte.lng);
         const isFav = favorites.includes(acte.id);
         const imgBlock = acte.img 
@@ -113,13 +135,26 @@ document.addEventListener("DOMContentLoaded", () => {
         let statusBadge = '';
         if (status === 'now') statusBadge = '<span class="badge badge-now"><i class="fa-solid fa-bolt"></i> Ara</span>';
         else if (status === 'soon') statusBadge = '<span class="badge badge-soon"><i class="fa-solid fa-stopwatch"></i> Aviat</span>';
+        else if (isFinished) statusBadge = '<span class="badge" style="background-color: #64748b; color: #ffffff;"><i class="fa-solid fa-flag-checkered"></i> Finalitzat</span>';
 
         const linkedBadge = isLinked 
             ? `<span class="badge badge-linked">${acte.org}</span>` 
             : '';
 
+        let noEndWarning = '';
+        if (!acte.horaFi) {
+            const now = new Date();
+            const start = parseDateTime(acte.dataIso, acte.horaInici);
+            const hoursSinceStart = (now - start) / (1000 * 60 * 60);
+            if (hoursSinceStart >= 1 && hoursSinceStart < 3) {
+                noEndWarning = '<div style="font-size:12px; color:#d97706; margin-top:6px; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation"></i> Aquest acte podria haver acabat ja que no hi ha hora exacta de finalització.</div>';
+            }
+        }
+
+        const cardStyle = isFinished ? 'style="opacity: 0.6; filter: grayscale(30%);"' : '';
+
         return `
-            <div class="event-card" onclick="openModalById(${acte.id})">
+            <div class="event-card" ${cardStyle} onclick="openModalById(${acte.id})">
                 <div class="event-card-img-wrapper">${imgBlock}</div>
                 <div class="event-card-info">
                     <h4>${acte.titol}</h4>
@@ -130,11 +165,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="badge-row">
                         ${statusBadge}
                         ${linkedBadge}
-                        ${acte.fuego ? '<span class="badge badge-fire"><i class="fa-solid fa-fire"></i></span>' : ''}
-                        ${acte.ruido ? '<span class="badge badge-noise"><i class="fa-solid fa-volume-high"></i></span>' : ''}
+                        ${acte.fuego ? '<span class="badge badge-fire"><i class="fa-solid fa-fire"></i> Pirotècnia</span>' : ''}
+                        ${acte.ruido ? '<span class="badge badge-noise"><i class="fa-solid fa-volume-high"></i> Soroll Elevat</span>' : ''}
                         ${acte.acc ? '<span class="badge badge-acc"><i class="fa-solid fa-wheelchair"></i> PMR</span>' : ''}
-                        ${acte.familia ? '<span class="badge badge-familia">Familiar</span>' : ''}
+                        ${acte.familia ? '<span class="badge badge-familia"><i class="fa-solid fa-people-roof"></i> Familiar</span>' : ''}
+                        ${acte.infantil ? '<span class="badge badge-infantil"><i class="fa-solid fa-child-reaching"></i> Infantil</span>' : ''}
                     </div>
+                    ${noEndWarning}
                 </div>
                 <button class="fav-btn-inline ${isFav ? 'active' : ''}" onclick="toggleFavInline(event, ${acte.id})">
                     <i class="fa-solid fa-heart"></i>
@@ -181,18 +218,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         Object.values(grouped).forEach(group => {
             const anyLive = group.some(a => ['now', 'soon'].includes(getEventStatus(a)));
+            const allFinished = group.every(a => isEventFinished(a));
             const pulseHtml = anyLive ? `<div class="live-pulse"></div>` : '';
+            const opacityStyle = allFinished ? 'opacity: 0.55; filter: grayscale(70%);' : '';
 
             if (group.length === 1) {
                 const acte = group[0];
+                const isFin = isEventFinished(acte);
                 const m = L.marker([acte.lat, acte.lng], { 
-                    icon: L.divIcon({ html: `<div class="marker-pin" style="--color:${acte.color}">${pulseHtml}<i class="fa-solid ${acte.icona}"></i></div>`, className: '', iconSize: [36,36], iconAnchor: [18,18] }) 
+                    icon: L.divIcon({ html: `<div class="marker-pin" style="--color:${isFin ? '#64748b' : acte.color}; ${isFin ? 'opacity:0.6; filter:grayscale(60%);' : ''}">${pulseHtml}<i class="fa-solid ${acte.icona}"></i></div>`, className: '', iconSize: [36,36], iconAnchor: [18,18] }) 
                 }).addTo(mapGroup);
                 m.on('click', () => openModalById(acte.id));
                 listEl.innerHTML += renderCardHTML(acte);
             } else {
                 const m = L.marker([group[0].lat, group[0].lng], { 
-                    icon: L.divIcon({ html: `<div class="marker-pin" style="--color:#0f172a">${pulseHtml}<span style="font-weight:800; font-size:14px;">${group.length}</span></div>`, className: '', iconSize: [36,36], iconAnchor: [18,18] }) 
+                    icon: L.divIcon({ html: `<div class="marker-pin" style="--color:${allFinished ? '#64748b' : '#0f172a'}; ${opacityStyle}">${pulseHtml}<span style="font-weight:800; font-size:14px;">${group.length}</span></div>`, className: '', iconSize: [36,36], iconAnchor: [18,18] }) 
                 }).addTo(mapGroup);
                 m.on('click', () => openMultiModal(group));
                 group.forEach(acte => { listEl.innerHTML += renderCardHTML(acte); });
@@ -349,17 +389,28 @@ document.addEventListener("DOMContentLoaded", () => {
         orgEl.innerText = acte.org;
         orgEl.dataset.org = acte.org;
 
-        document.getElementById('modal-date').innerText = `${acte.diaNom} (${acte.horaInici} - ${acte.horaFi}h)`;
+        document.getElementById('modal-date').innerText = acte.horaFi ? `${acte.diaNom} (${acte.horaInici} - ${acte.horaFi}h)` : `${acte.diaNom} (${acte.horaInici}h)`;
         document.getElementById('modal-place').innerText = acte.lloc;
         
         const dist = getDistanceMeters(acte.lat, acte.lng);
         document.getElementById('modal-distance').innerHTML = dist !== Infinity ? (dist < 1000 ? `${Math.round(dist)}m` : `${(dist/1000).toFixed(1)}km`) : '';
         document.getElementById('modal-desc').innerText = acte.desc;
 
+        if (!acte.horaFi) {
+            const now = new Date();
+            const start = parseDateTime(acte.dataIso, acte.horaInici);
+            const hoursSinceStart = (now - start) / (1000 * 60 * 60);
+            if (hoursSinceStart >= 1 && hoursSinceStart < 3) {
+                document.getElementById('modal-desc').innerHTML += '<div style="font-size:13px; color:#d97706; margin-top:8px; padding: 8px; background: #fef3c7; border-radius: 6px;"><i class="fa-solid fa-triangle-exclamation"></i> Aquest acte podria haver acabat ja que no hi ha hora exacta de finalització.</div>';
+            }
+        }
+
         let badges = '';
         const status = getEventStatus(acte);
+        const isFinished = isEventFinished(acte);
         if (status === 'now') badges += `<span class="badge badge-now"><i class="fa-solid fa-bolt"></i> Passant Ara</span> `;
         else if (status === 'soon') badges += `<span class="badge badge-soon"><i class="fa-solid fa-stopwatch"></i> Comença Aviat</span> `;
+        else if (isFinished) badges += `<span class="badge" style="background-color: #64748b; color: #ffffff;"><i class="fa-solid fa-flag-checkered"></i> Acte Finalitzat</span> `;
 
         if (acte.fuego) badges += `<span class="badge badge-fire"><i class="fa-solid fa-fire"></i> Pirotècnia</span> `;
         if (acte.ruido) badges += `<span class="badge badge-noise"><i class="fa-solid fa-volume-high"></i> Soroll Elevat</span> `;
