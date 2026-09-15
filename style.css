@@ -103,6 +103,15 @@ body { background-color: var(--bg-main); color: var(--text-main); overflow: hidd
 .badge-now { background: var(--primary); animation: blink 1.5s infinite; }
 .badge-soon { background: #eab308; color: #422006; animation: blink 1.5s infinite; }
 
+/* Disclaimers en Modal */
+.modal-disclaimers-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; margin-top: 4px; }
+.disclaimer-chip { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.disclaimer-chip.fire-disclaimer { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+.disclaimer-chip.fire-disclaimer:hover { background: #ffedd5; }
+.disclaimer-chip.info-disclaimer { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.disclaimer-chip.info-disclaimer:hover { background: #fde68a; }
+.disclaimer-chip u { text-decoration-thickness: 1px; }
+
 /* Inline Verification Badge Tooltip */
 .verified-icon-inline { display: inline-flex; align-items: center; position: relative; margin-left: 6px; font-size: 16px; cursor: pointer; vertical-align: middle; }
 .verified-icon-inline:hover::after {
@@ -145,6 +154,7 @@ body { background-color: var(--bg-main); color: var(--text-main); overflow: hidd
 .modal-actions-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding-bottom: 20px;}
 .modal-action-btn { flex: 1; min-width: 120px; padding: 14px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;}
 .ticket-btn-action { background: #10b981; color: white; flex-basis: 100%; text-decoration: none; }
+.rsvp-btn-action { background: #2563eb; color: white; flex-basis: 100%; text-decoration: none; }
 .fav-btn-action { background: #fce4ec; color: var(--primary); }
 .nav-btn-action { background: #f8fafc; border: 1px solid var(--border); color: var(--text-main); }
 
@@ -170,6 +180,12 @@ body { background-color: var(--bg-main); color: var(--text-main); overflow: hidd
 .service-icon-box { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; }
 .lila-bg { background: var(--purple-lila); }
 .police-bg { background: var(--blue-police); }
+
+/* FONS DELS NOUS SERVEIS */
+.fire-bg { background: #ea580c; }
+.amber-bg { background: #d97706; }
+.bus-bg { background: #0284c7; }
+
 .service-info { flex: 1; }
 .service-info h3 { font-size: 15px; font-weight: 800; margin-bottom: 4px;}
 .service-info p { font-size: 13px; color: var(--text-sub); line-height: 1.3;}
@@ -177,9 +193,26 @@ body { background-color: var(--bg-main); color: var(--text-main); overflow: hidd
 .service-tag.purple { background: #f3e8ff; color: var(--purple-dark); }
 .service-tag.blue { background: #dbeafe; color: var(--blue-police); }
 
-/* Lila / Police Hero */
+/* ETIQUETES DELS NOUS SERVEIS */
+.service-tag.orange { background: #ffedd5; color: #c2410c; }
+.service-tag.amber { background: #fef3c7; color: #b45309; }
+.service-tag.gray { background: #f1f5f9; color: #64748b; }
+
+/* Lila / Police / Foc / Sensorial / Bus Hero */
 .lila-hero { padding: 40px 20px 24px; color: white; text-align: center; }
 .police-hero { background: linear-gradient(135deg, #1e40af, #1d4ed8); padding: 40px 20px 24px; color: white; text-align: center; }
+
+/* HEROES I BADGES DELS NOUS MODALS */
+.foc-hero { background: linear-gradient(135deg, #c2410c, #ea580c); padding: 40px 20px 24px; color: white; text-align: center; }
+.foc-status-badge { background: rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800; display: inline-block; }
+.foc-subtitle { font-size: 14px; color: var(--text-sub); margin-top: 4px; margin-bottom: 16px; }
+
+.sensorial-hero { background: linear-gradient(135deg, #d97706, #b45309); padding: 40px 20px 24px; color: white; text-align: center; }
+.sensorial-status-badge { background: rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800; display: inline-block; }
+
+.bus-hero { background: linear-gradient(135deg, #0284c7, #0369a1); padding: 40px 20px 24px; color: white; text-align: center; }
+.bus-status-badge { background: rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800; display: inline-block; }
+
 .lila-icon-big { font-size: 42px; margin-bottom: 12px; }
 .lila-status-badge, .police-status-badge { background: rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 800; display: inline-block;}
 .lila-status-badge.open { background: #22c55e; }
