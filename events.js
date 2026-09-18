@@ -83,7 +83,7 @@ const actesData = [
     "diaKey": "divendres_18",
     "diaNom": "Divendres 18 de Setembre",
     "dataIso": "2026-09-18",
-    "horaInici": "21:30",
+    "horaInici": "22:30",
     "categoria": "Festa",
     "icona": "fa-music",
     "color": "#ed0ca6",
