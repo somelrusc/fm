@@ -13,23 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let filterFavoritesOnly = false;
     let featureFilters = { acc: false, noFuego: false, noRuido: false, noAglom: false, familia: false, infantil: false };
 
-    // LOGICA NOU BOTO AVUI
-    const currentNow = new Date();
-    const isFestivalDate = currentNow.getFullYear() === 2026 && currentNow.getMonth() === 8 && currentNow.getDate() >= 18 && currentNow.getDate() <= 29;
-    let todayKey = null;
-
-    if (isFestivalDate) {
-        const daysMap = {
-            18: "divendres_18", 19: "dissabte_19", 20: "diumenge_20", 21: "dilluns_21", 22: "dimarts_22", 23: "dimecres_23", 
-            24: "dijous_24", 25: "divendres_25", 26: "dissabte_26", 27: "diumenge_27", 28: "dilluns_28", 29: "dimarts_29"
-        };
-        todayKey = daysMap[currentNow.getDate()];
-        const avuiOption = document.getElementById('option-avui');
-        if (avuiOption) {
-            avuiOption.style.display = 'block';
-        }
-    }
-
     const puntsLilas = [
         { id: 'l1', titol: "Punt Lila Parc Baix Llobregat", lloc: "Parc del Baix Llobregat", lat: 41.406296466620596, lng: 2.018085377798271, horaris: [{ dia: "2026-09-25", diaStr: "Dv 25/09", inici: "22:00", fi: "04:00" }, { dia: "2026-09-26", diaStr: "Ds 26/09", inici: "22:00", fi: "04:00" }, { dia: "2026-09-28", diaStr: "Dl 28/09", inici: "22:00", fi: "05:00" }], serveis: ["Assessorament", "Acompanyament", "Informació"] },
         { id: 'l2', titol: "Punt Lila Itinerant", lloc: "Recorregut del Correfoc i Matines", lat: 41.413735699904365, lng: 2.0161305796600555, horaris: [{ dia: "2026-09-25", diaStr: "Dv 25/09", inici: "21:00", fi: "23:30" }, { dia: "2026-09-26", diaStr: "Ds 26/09", inici: "20:30", fi: "23:30" }, { dia: "2026-09-29", diaStr: "Dt 29/09", inici: "06:00", fi: "08:00" }], serveis: ["Atenció Itinerant directa", "Acompanyament coordinat"] }
@@ -116,12 +99,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
     function getFilteredActes(filtreDia) {
         let filtrats = [...actes];
         if (filterFavoritesOnly) filtrats = filtrats.filter(a => favorites.includes(a.id));
-        
-        let targetDia = filtreDia;
-        if (filtreDia === 'avui' && todayKey) targetDia = todayKey;
-
-        if (targetDia === 'now') filtrats = filtrats.filter(a => ['now', 'soon'].includes(getEventStatus(a)));
-        else if (targetDia !== 'all') filtrats = filtrats.filter(a => a.diaKey === targetDia);
+        if (filtreDia === 'now') filtrats = filtrats.filter(a => ['now', 'soon'].includes(getEventStatus(a)));
+        else if (filtreDia !== 'all') filtrats = filtrats.filter(a => a.diaKey === filtreDia);
         
         if (featureFilters.acc) filtrats = filtrats.filter(a => a.acc === true);
         if (featureFilters.noFuego) filtrats = filtrats.filter(a => a.fuego === false);
@@ -373,9 +352,29 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
             </div>`;
             
             dayGroup.actes.forEach(a => {
-                html += `<div class="multi-event-item" onclick="openModalById(${a.id})">
+                const status = getEventStatus(a);
+                const isFinished = isEventFinished(a);
+                let statusBadge = '';
+                
+                if (status === 'now') {
+                    statusBadge = '<span class="badge badge-now" style="font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-bolt"></i> Ara</span>';
+                } else if (status === 'soon') {
+                    statusBadge = '<span class="badge badge-soon" style="font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-stopwatch"></i> Aviat</span>';
+                } else if (isFinished) {
+                    statusBadge = '<span class="badge" style="background-color: #64748b; color: #ffffff; font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-flag-checkered"></i> Finalitzat</span>';
+                }
+                
+                const itemStyle = isFinished ? 'style="opacity: 0.6; filter: grayscale(30%);"' : '';
+
+                html += `<div class="multi-event-item" ${itemStyle} onclick="openModalById(${a.id})">
                     <div class="multi-event-icon" style="background:${a.color}"><i class="fa-solid ${a.icona}"></i></div>
-                    <div><h4 style="font-size:14px; font-weight:800; margin:0;">${a.titol}</h4><span style="font-size:12px; color:#64748b;"><i class="fa-solid fa-clock"></i> ${a.horaInici}h</span></div>
+                    <div>
+                        <h4 style="font-size:14px; font-weight:800; margin:0;">${a.titol}</h4>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                            <span style="font-size:12px; color:#64748b;"><i class="fa-solid fa-clock"></i> ${a.horaInici}h</span>
+                            ${statusBadge}
+                        </div>
+                    </div>
                 </div>`;
             });
         });
@@ -618,10 +617,6 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
     };
 
     // FUNCIONS PEL MODAL D'INSTAL·LACIÓ NOU
-    window.openInstallModal = function() {
-        document.getElementById('install-modal').classList.add('open');
-    };
-
     window.closeInstallModal = function() {
         document.getElementById('install-modal').classList.remove('open');
     };
