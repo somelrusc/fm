@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FMAPP | Molins de Rei</title>
-    <!-- Favicon afegit -->
-    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="icon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -34,6 +33,7 @@
             <select id="day-select" onchange="onDayChange()">
                 <option value="now" selected>⚡ Està passant ara</option>
                 <option value="all">📅 Tots els actes</option>
+                <option value="avui" id="option-avui" style="display:none; font-weight:bold;">📍 Avui</option>
                 <option value="divendres_18">Divendres 18 de Setembre</option>
                 <option value="dissabte_19">Dissabte 19 de Setembre</option>
                 <option value="diumenge_20">Diumenge 20 de Setembre</option>
@@ -102,14 +102,13 @@
             <p>Punts d'atenció, emergències i informació</p>
         </div>
         <div class="services-list">
-            
-            <!-- NOU SERVEI: INSTRUCCIONS D'INSTAL·LACIÓ AFEGIT -->
-            <div class="service-card" onclick="document.getElementById('install-modal').classList.add('open')">
+            <!-- NOU SERVEI: INSTRUCCIONS DE DESCÀRREGA -->
+            <div class="service-card" onclick="openInstallModal()">
                 <div class="service-icon-box" style="background: var(--primary);"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
                 <div class="service-info">
-                    <h3>Instal·lar l'App</h3>
-                    <p>Torna a veure les instruccions per afegir l'aplicació a la pantalla d'inici.</p>
-                    <span class="service-tag" style="background: #fce4ec; color: var(--primary);">App i Configuració</span>
+                    <h3>Instal·lar l'Aplicació</h3>
+                    <p>Torna a veure les instruccions per afegir l'App a la pantalla d'inici.</p>
+                    <span class="service-tag" style="background: #fce4ec; color: var(--primary);">Descàrrega</span>
                 </div>
                 <i class="fa-solid fa-chevron-right arrow-more"></i>
             </div>
@@ -411,9 +410,9 @@
                 <div style="font-size: 52px; color: var(--primary); margin-bottom: 16px;">
                     <i class="fa-solid fa-arrow-down-to-bracket"></i>
                 </div>
-                <h2 style="justify-content: center;">Guarda l'App per a un bon funcionament<r/h2>
+                <h2 style="justify-content: center;">Guarda l'App</h2>
                 <p style="font-size: 14px; color: var(--text-sub); margin-top: 8px; margin-bottom: 24px; line-height: 1.5;">
-                    <br>Afegeix aquesta web a la teva pantalla d'inici per assegurar el bon funcionament de l'aplicatiu. Alguns dispositius poden tenir errors amb la barra inferior, per la qual cosa et recomanem afegir a la pantalla d'inici.<br><strong>No es descarregarà cap programari</strong>, simplement es guardarà un accés directe al teu dispositiu per funcionar molt més ràpid.
+                    Afegeix aquesta web a la teva pantalla d'inici per accedir-hi ràpidament com si fos una App nativa.<br><br><strong>No es descarregarà cap programari</strong>, simplement es guardarà un accés directe al teu dispositiu per funcionar molt més ràpid.
                 </p>
                 <div class="modal-actions-row">
                     <button class="modal-action-btn" id="install-app-btn" style="background: var(--primary); color: white; width: 100%; flex-basis: 100%;">
