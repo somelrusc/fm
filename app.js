@@ -198,10 +198,12 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
         if (filtreDia === 'now') {
             document.getElementById('sheet-status-title').innerHTML = '<i class="fa-solid fa-bolt"></i> Està passant ara';
             if (filtrats.length > 0) {
-                displayEvents = filtrats.sort((a, b) => getDistanceMeters(a.lat, a.lng) - getDistanceMeters(b.lat, b.lng)).slice(0, 5);
+                // MODIFICACIÓ: Si hi ha actes passant o que comencen aviat, els mostrem TOTS sense límit.
+                displayEvents = filtrats.sort((a, b) => getDistanceMeters(a.lat, a.lng) - getDistanceMeters(b.lat, b.lng));
             } else {
+                // MODIFICACIÓ: Si NO hi ha cap acte, mostrem només els 4 pròxims.
                 let prx = getUpcomingEvents(getFilteredActes('all'));
-                displayEvents = prx.slice(0, 5);
+                displayEvents = prx.slice(0, 4);
                 if (displayEvents.length > 0) {
                     listEl.innerHTML = `<div style="padding: 12px; background: #e0f2fe; color: #0284c7; border-radius: 12px; font-size: 13px; font-weight: 700; margin-bottom: 16px;"><i class="fa-solid fa-circle-info"></i> No hi ha cap acte actiu ni previst immediatament. Et recomanem els propers.</div>`;
                 }
