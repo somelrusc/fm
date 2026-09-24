@@ -91,4 +91,12 @@ const organizersData = {
         ig: "https://www.instagram.com/consell.adolescents/",
         desc: "Consell d'Adolescents de Molins de Rei",
     },
+    "Mobilitat - FMAPP": { 
+        img: "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/MTS_Bus_icon.svg/960px-MTS_Bus_icon.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail", 
+        verified: true, 
+        badgeType: "",
+        verifiedDesc: "Servei de l'aplicació FMAPP",
+        ig: "https://www.instagram.com/somelrusc/",
+        desc: "Departament de Mobilitat de la FMAPP. Consulta els horaris del transport a l'apartat mobiltitat o a 'Reservar'",
+    },
 };
