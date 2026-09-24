@@ -83,4 +83,12 @@ const organizersData = {
         ig: "https://www.instagram.com/el_cuc_molins_de_rei/",
         desc: "Grup del drac de molins de rei format l'any 1995.",
     },
+    "Consell d'Adolescents de Molins de Rei": { 
+        img: "https://molinsderei.cat/wp-content/uploads/2023/05/conselladoles1.jpg", 
+        verified: true, 
+        badgeType: "",
+        verifiedDesc: "Institució Pública",
+        ig: "https://www.instagram.com/consell.adolescents/",
+        desc: "Consell d'Adolescents de Molins de Rei",
+    },
 };
