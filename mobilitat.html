@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FMAPP Mobilitat - Festa Major Molins de Rei</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e11d48', /* Rose 600 */
+                        'primary-dark': '#be123c',
+                        surface: '#ffffff',
+                        background: '#f8fafc',
+                        panel: '#f1f5f9'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Custom Inline Styles for Map, Theme & Animations -->
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #e11d48;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animations */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in forwards; }
+
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-soft { animation: pulseSoft 2s infinite; }
+
+        /* Assistant Typewriter Cursor */
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: var(--accent);
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Leaflet custom marker styles */
+        .custom-bus-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            transition: transform 0.3s ease;
+        }
+        .custom-bus-marker:hover { transform: scale(1.1); }
+        
+        .marker-mb1 { background-color: #0284c7; }
+        .marker-mb2 { background-color: #059669; }
+        .marker-mixed { background: linear-gradient(135deg, #0284c7 50%, #059669 50%); }
+
+        /* User Location Marker */
+        .custom-user-marker {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-ping {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            opacity: 0.4;
+            animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .user-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            border: 2.5px solid white;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.6);
+            z-index: 2;
+        }
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
+        /* Light map popups */
+        .leaflet-popup-content-wrapper {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 2px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .leaflet-popup-tip {
+            background-color: var(--bg-card);
+        }
+        .leaflet-popup-content h4 { color: #0f172a; margin-bottom: 4px; }
+        .leaflet-popup-content p { color: var(--text-muted); margin: 0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-12 bg-background text-slate-800">
+
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200 px-4 py-3 shadow-sm transition-all">
+        <div class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3 text-slate-800 font-bold">
+                <a href="index.html" class="mr-1 text-slate-400 hover:text-primary transition-colors">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 animate-pulse-soft">
+                    <i class="fa-solid fa-bus text-primary"></i>
+                </div>
+                <span>FMAPP Mobilitat</span>
+            </div>
+            <div class="text-right flex items-center gap-3">
+                <div>
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-primary block">Molins de Rei</span>
+                    <h1 class="text-xs font-medium text-slate-500 leading-tight">Festa Major</h1>
+                </div>
+                <a href="index.html" class="text-[10px] bg-slate-100 border border-slate-200 px-2 py-1 rounded font-bold text-slate-600 hover:bg-slate-200 transition-colors">Tornar a l'App</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto w-full flex-1 flex flex-col relative" id="main-content">
+
+        <!-- 3 TABS EXACT ORDER -->
+        <nav class="bg-white border-b border-slate-200 sticky top-[61px] z-40 shadow-sm transition-all">
+            <div class="flex">
+                <!-- Tab 1: Horaris -->
+                <button id="btn-tab-horaris" onclick="switchTab('horaris')" class="flex-1 py-3.5 px-2 text-center text-xs font-extrabold border-b-2 border-primary text-primary transition-all flex items-center justify-center gap-1.5 bg-slate-50">
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Horaris</span>
+                </button>
+                
+                <!-- Tab 2: Què faig ara? (BETA) -->
+                <button id="btn-tab-asistent" onclick="switchTab('asistent')" class="flex-1 py-3.5 px-2 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-robot text-amber-500"></i>
+                    <span>Què faig ara?</span>
+                    <span class="bg-amber-100 text-amber-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-amber-200">BETA</span>
+                </button>
+                
+                <!-- Tab 3: Mapa -->
+                <button id="btn-tab-mapa" onclick="switchTab('mapa')" class="flex-1 py-3.5 px-2 text-center text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-map"></i>
+                    <span>Mapa</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- -->
+        <!-- TAB 1: HORARIS -->
+        <section id="tab-horaris" class="p-4 space-y-6 flex-1 animate-slide-up md:flex md:flex-col lg:flex-row lg:gap-6 lg:space-y-0">
+            
+            <div class="space-y-4 flex-1">
+                <!-- Route MB1 Card -->
+                <div class="bg-surface rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center border border-sky-200">
+                                <i class="fa-solid fa-bus-simple text-sky-600"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-sky-600 text-white font-extrabold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">MB1</span>
+                                    <h3 class="font-bold text-slate-800 text-sm">Ruta Urbana Central</h3>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Sortides des de Riera Bonet</p>
+                            </div>
+                        </div>
+                        <div id="status-mb1" class="text-right text-xs transition-all">
+                            <!-- JS updates this -->
+                            <i class="fa-solid fa-circle-notch fa-spin text-slate-400"></i>
+                        </div>
+                    </div>
+                    <!-- Horaris estatics MB1 -->
+                    <div class="grid grid-cols-4 md:grid-cols-8 gap-2 text-center text-xs font-medium">
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">22:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">23:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">00:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">01:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">02:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">03:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">04:00h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-sky-50 transition-colors">05:00h</div>
+                    </div>
+                </div>
+
+                <!-- Route MB2 Card -->
+                <div class="bg-surface rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center border border-emerald-200">
+                                <i class="fa-solid fa-bus-simple text-emerald-600"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-emerald-600 text-white font-extrabold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">MB2</span>
+                                    <h3 class="font-bold text-slate-800 text-sm">Ruta Perifèrica</h3>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Sortides des de Can Graner</p>
+                            </div>
+                        </div>
+                        <div id="status-mb2" class="text-right text-xs transition-all">
+                            <!-- JS updates this -->
+                            <i class="fa-solid fa-circle-notch fa-spin text-slate-400"></i>
+                        </div>
+                    </div>
+                    <!-- Horaris estatics MB2 -->
+                    <div class="grid grid-cols-4 md:grid-cols-8 gap-2 text-center text-xs font-medium">
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">22:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">23:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">00:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">01:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">02:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">03:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">04:30h</div>
+                        <div class="bg-slate-50 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-emerald-50 transition-colors">05:30h</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALTRES OPCIONS DE TRANSPORT -->
+            <section class="space-y-3 pt-2 lg:w-1/3">
+                <h3 class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest pl-1">Altres opcions de transport</h3>
+                <div class="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                    <a href="https://rodalies.gencat.cat/" target="_blank" class="bg-surface p-3 rounded-2xl border border-slate-200 hover:border-slate-300 flex flex-col justify-between space-y-2 transition-colors hover:shadow-sm">
+                        <i class="fa-solid fa-train text-orange-500 text-lg"></i>
+                        <div><h4 class="font-bold text-xs text-slate-800">Rodalies</h4><p class="text-[10px] text-slate-500">R4</p></div>
+                    </a>
+                    <a href="https://www.ambmobilitat.cat/" target="_blank" class="bg-surface p-3 rounded-2xl border border-slate-200 hover:border-slate-300 flex flex-col justify-between space-y-2 transition-colors hover:shadow-sm">
+                        <i class="fa-solid fa-moon text-yellow-500 text-lg"></i>
+                        <div><h4 class="font-bold text-xs text-slate-800">Nitbus</h4><p class="text-[10px] text-slate-500">N50 / N52</p></div>
+                    </a>
+                    <a href="tel:+933755555" class="bg-surface p-3 rounded-2xl border border-slate-200 hover:border-slate-300 flex flex-col justify-between space-y-2 transition-colors hover:shadow-sm">
+                        <i class="fa-solid fa-taxi text-primary text-lg"></i>
+                        <div><h4 class="font-bold text-xs text-slate-800">Taxi</h4><p class="text-[10px] text-slate-500">93 375 55 55</p></div>
+                    </a>
+                    <a href="https://www.fgc.cat/" target="_blank" class="bg-surface p-3 rounded-2xl border border-slate-200 hover:border-slate-300 flex flex-col justify-between space-y-2 transition-colors hover:shadow-sm">
+                        <i class="fa-solid fa-train-subway text-lime-500 text-lg"></i>
+                        <div><h4 class="font-bold text-xs text-slate-800">FGC</h4><p class="text-[10px] text-slate-500">La Floresta</p></div>
+                    </a>
+                </div>
+            </section>
+        </section>
+
+        <!-- -->
+        <!-- TAB 2: QUÈ FAIG ARA? (BETA) -->
+        <section id="tab-asistent" class="p-4 space-y-4 hidden flex-1 flex flex-col h-full min-h-[500px] animate-slide-up">
+            
+            <div id="ast-init-state" class="bg-surface border border-slate-200 rounded-3xl p-6 text-center shadow-sm space-y-6 flex-1 flex flex-col justify-center">
+                <div class="w-16 h-16 bg-slate-100 text-amber-500 rounded-2xl flex items-center justify-center mx-auto text-3xl border border-slate-200 animate-pulse-soft">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-xl font-extrabold text-slate-800">No saps com tornar?</h2>
+                    <p class="text-xs text-slate-500 max-w-[250px] mx-auto leading-relaxed">Et localitzem, cerquem la parada més propera i t'ajudem a crear un pla per agafar el bus nocturn.</p>
+                </div>
+                
+                <div class="space-y-3 w-full max-w-sm mx-auto">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tria la teva ruta:</p>
+                    <div class="flex gap-3">
+                        <button onclick="startAssistant('MB1')" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-4 rounded-xl shadow-sm transition-all text-sm transform hover:-translate-y-1">
+                            Ruta MB1
+                        </button>
+                        <button onclick="startAssistant('MB2')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-sm transition-all text-sm transform hover:-translate-y-1">
+                            Ruta MB2
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat State -->
+            <div id="ast-chat-state" class="hidden flex-1 flex flex-col bg-surface border border-slate-200 rounded-3xl overflow-hidden shadow-sm relative h-full">
+                <!-- Header chat -->
+                <div class="bg-slate-50 p-3 border-b border-slate-200 flex items-center gap-3 z-10 relative">
+                    <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-amber-500 shadow-sm animate-pulse-soft">
+                        <i class="fa-solid fa-robot text-sm"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">FMBot <span class="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-1 font-extrabold">BETA</span></h4>
+                        <p class="text-[10px] text-slate-500">Assistent de Mobilitat</p>
+                    </div>
+                    <button onclick="resetAssistant()" class="ml-auto w-8 h-8 rounded-full bg-white hover:bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 transition-colors shadow-sm active:scale-95">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Chat window -->
+                <div id="chat-window" class="p-4 flex-1 overflow-y-auto space-y-4 text-sm font-medium h-[400px] scroll-smooth pb-20">
+                    <!-- Messages go here -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- -->
+        <!-- TAB 3: MAPA INTERACTIU -->
+        <section id="tab-mapa" class="p-4 space-y-4 hidden flex-1 flex flex-col relative h-[500px] animate-slide-up">
+            <div class="flex-1 w-full rounded-3xl overflow-hidden border border-slate-200 shadow-sm relative h-full min-h-[400px]">
+                <div id="map" class="w-full h-full z-10 bg-slate-100 absolute inset-0"></div>
+                
+                <!-- Overlay filters -->
+                <div class="absolute top-3 left-3 z-20 flex gap-2">
+                    <button onclick="filterMap('all')" id="filter-all" class="py-1.5 px-3 rounded-lg font-bold text-xs bg-white text-slate-800 border border-slate-200 shadow-sm transition-all hover:scale-105 active:scale-95">
+                        Totes
+                    </button>
+                    <button onclick="filterMap('mb1')" id="filter-mb1" class="py-1.5 px-3 rounded-lg font-bold text-xs bg-white text-sky-600 border border-slate-200 shadow-sm transition-all hover:scale-105 active:scale-95">
+                        MB1
+                    </button>
+                    <button onclick="filterMap('mb2')" id="filter-mb2" class="py-1.5 px-3 rounded-lg font-bold text-xs bg-white text-emerald-600 border border-slate-200 shadow-sm transition-all hover:scale-105 active:scale-95">
+                        MB2
+                    </button>
+                </div>
+
+                <!-- Botó per recentrar i actualitzar la ubicació de l'usuari -->
+                <button onclick="getUserLocationOnMap(true)" title="La teva ubicació" class="absolute bottom-4 right-4 z-20 bg-white hover:bg-slate-50 text-blue-600 p-3 rounded-full border border-slate-200 shadow-md transition-all active:scale-95 flex items-center justify-center w-11 h-11">
+                    <i class="fa-solid fa-location-crosshairs text-lg"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- -->
+    <script>
+        // STRICT SCHEDULE DATA - ONLY TRUE DATA
+        // If a stop does not have an exact minute offset in the official schedule, it gets NO offset.
+        // The assistant will use the previous and next control stops.
+        
+        const MB1_STOPS = [
+            { seq: 1,  name: "Riera Bonet", lat: 41.404797, lng: 2.027715, isControl: true, offsetMins: 0 },
+            { seq: 2,  name: "Av. Barcelona - Riera Bonet", lat: 41.404653, lng: 2.025642, isControl: false },
+            { seq: 3,  name: "Av. Barcelona", lat: 41.406791, lng: 2.023218, isControl: false },
+            { seq: 4,  name: "Canal de la Infanta", lat: 41.407384, lng: 2.021491, isControl: false },
+            { seq: 5,  name: "Parc del Pont de la Cadena - Recinte", lat: 41.408580, lng: 2.018759, isControl: false },
+            { seq: 6,  name: "Av. Valencia Pg. Pi i Maragall", lat: 41.409886, lng: 2.018577, isControl: true, offsetMins: 7 },
+            { seq: 7,  name: "Nova Parada Temporal", lat: 41.410034, lng: 2.015317, isControl: false },
+            { seq: 8,  name: "Rbla de la Granja", lat: 41.415837, lng: 2.012403, isControl: false },
+            { seq: 9,  name: "Les Sínies", lat: 41.417692, lng: 2.011619, isControl: false },
+            { seq: 10, name: "CAP Ambulatori", lat: 41.418352, lng: 2.013489, isControl: true, offsetMins: 15 },
+            { seq: 11, name: "Anselm Clavé", lat: 41.416557, lng: 2.014768, isControl: false },
+            { seq: 12, name: "Verdaguer Ca n'Ametller", lat: 41.414603, lng: 2.016550, isControl: false },
+            { seq: 13, name: "Pl. Països Catalans", lat: 41.414808, lng: 2.018470, isControl: false },
+            { seq: 14, name: "Onze de Setembre", lat: 41.412856, lng: 2.020746, isControl: false },
+            { seq: 15, name: "Poliesportiu", lat: 41.412196, lng: 2.020406, isControl: false },
+            { seq: 16, name: "Pas Soterrat Rodalies", lat: 41.408906, lng: 2.022317, isControl: true, offsetMins: 21 },
+            { seq: 17, name: "Joan Maragall", lat: 41.408104, lng: 2.023982, isControl: false },
+            { seq: 18, name: "Carme Galceran - Cristòfor Colom", lat: 41.409379, lng: 2.022890, isControl: false },
+            { seq: 19, name: "Estel Sant Joan", lat: 41.410490, lng: 2.022526, isControl: false },
+            { seq: 20, name: "Cristòfor Colom", lat: 41.410182, lng: 2.024947, isControl: false },
+            { seq: 21, name: "Plaça de la Pau", lat: 41.410765, lng: 2.025430, isControl: false },
+            { seq: 22, name: "Can Graner", lat: 41.412839, lng: 2.027547, isControl: true, offsetMins: 30 }
+        ];
+
+        const MB2_STOPS = [
+            { seq: 1,  name: "Can Graner", lat: 41.412839, lng: 2.027547, isControl: true, offsetMins: 0 },
+            { seq: 2,  name: "Sta. Creu d'Olorda - Josep Carner", lat: 41.413179, lng: 2.025188, isControl: false },
+            { seq: 3,  name: "Alzina - Pere Quart", lat: 41.413627, lng: 2.023360, isControl: false },
+            { seq: 4,  name: "Bonavista", lat: 41.414428, lng: 2.022110, isControl: false },
+            { seq: 5,  name: "Puigcerdà - Onze de Setembre", lat: 41.413919, lng: 2.020255, isControl: false },
+            { seq: 6,  name: "Verdaguer - Torras i Bages", lat: 41.415604, lng: 2.021029, isControl: false },
+            { seq: 7,  name: "Ctra. de Vallvidrera - Antoni Gaudí", lat: 41.416444, lng: 2.022704, isControl: false },
+            { seq: 8,  name: "Ctra. de Vallvidrera - Av. Collserola", lat: 41.416433, lng: 2.022499, isControl: true, offsetMins: 9 },
+            { seq: 9,  name: "Federació Obrera", lat: 41.415162, lng: 2.019335, isControl: false },
+            { seq: 10, name: "Pl. Països Catalans", lat: 41.414845, lng: 2.018334, isControl: false },
+            { seq: 11, name: "Verdaguer - Ca n'Ametller", lat: 41.414648, lng: 2.016340, isControl: false },
+            { seq: 12, name: "Anselm Clavé", lat: 41.416679, lng: 2.014852, isControl: false },
+            { seq: 13, name: "CAP - Ambulatori", lat: 41.418386, lng: 2.013257, isControl: true, offsetMins: 12 },
+            { seq: 14, name: "Sínies", lat: 41.417826, lng: 2.011647, isControl: false },
+            { seq: 15, name: "Rbla de la Granja", lat: 41.415710, lng: 2.012334, isControl: false },
+            { seq: 16, name: "Parc del Pont de la Cadena - Recinte", lat: 41.407806, lng: 2.018637, isControl: false },
+            { seq: 17, name: "Felip Canalias", lat: 41.405185, lng: 2.019698, isControl: false },
+            { seq: 18, name: "Francesc Layret", lat: 41.404956, lng: 2.023266, isControl: false },
+            { seq: 19, name: "Llobregat - Av. Barcelona", lat: 41.404111, lng: 2.025833, isControl: false },
+            { seq: 20, name: "Riera Bonet", lat: 41.404797, lng: 2.027715, isControl: true, offsetMins: 30 }
+        ];
+
+        const SCHEDULES = {
+            MB1: ["22:00", "23:00", "00:00", "01:00", "02:00", "03:00", "04:00", "05:00"],
+            MB2: ["22:30", "23:30", "00:30", "01:30", "02:30", "03:30", "04:30", "05:30"]
+        };
+
+        // Estado del usuario en el bot para recordarlo en las respuestas secundarias
+        let currentUserState = {
+            lat: null,
+            lng: null,
+            route: null,
+            closestStop: null,
+            prevControlStop: null
+        };
+
+        // Lógica de comprobación de los días y horarios que tienen servicio 
+        function checkServiceAvailability() {
+            const now = new Date();
+            const d = now.getDate();
+            const h = now.getHours();
+            
+            // Viernes 25 a Sabado 26 (22:00 - 06:00)
+            const night1 = (d === 25 && h >= 22) || (d === 26 && h < 6);
+            // Sabado 26 a Domingo 27 (22:00 - 06:00)
+            const night2 = (d === 26 && h >= 22) || (d === 27 && h < 6);
+            // Lunes 28 a Martes 29 (22:00 - 06:00)
+            const night3 = (d === 28 && h >= 22) || (d === 29 && h < 6);
+            
+            return night1 || night2 || night3;
+        }
+
+        // Real-time Status Logic
+        function updateRealTimeStatus() {
+            const now = new Date();
+            const currMins = parseToTotalMins(`${now.getHours()}:${now.getMinutes()}`);
+            const isAvailable = checkServiceAvailability();
+            
+            ['MB1', 'MB2'].forEach(route => {
+                let status = "Servei finalitzat";
+                let statusClass = "text-slate-500 font-bold bg-slate-100 px-2 py-1 rounded";
+                
+                if (!isAvailable) {
+                    status = "Avui no hi ha servei";
+                    statusClass = "text-red-700 font-extrabold bg-red-100 border border-red-200 px-2 py-1 rounded animate-pulse-soft inline-block uppercase";
+                } else {
+                    for (let t of SCHEDULES[route]) {
+                        let baseMins = parseToTotalMins(t);
+                        
+                        if (currMins < baseMins) {
+                            status = `Proper bus: ${t}h`;
+                            statusClass = "text-primary font-bold bg-primary/10 px-2 py-1 rounded animate-pulse-soft inline-block";
+                            break;
+                        } else if (currMins >= baseMins && currMins < baseMins + 30) {
+                            status = `En ruta (Sortida ${t}h)`;
+                            statusClass = "text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded animate-pulse-soft inline-block";
+                            break;
+                        }
+                    }
+                }
+                document.getElementById(`status-${route.toLowerCase()}`).innerHTML = `<span class="${statusClass}">${status}</span>`;
+            });
+        }
+        
+        // Execute real time update on load and every minute
+        updateRealTimeStatus();
+        setInterval(updateRealTimeStatus, 60000);
+
+        // UI TAB LOGIC
+        function switchTab(tabId) {
+            ['horaris', 'asistent', 'mapa'].forEach(id => {
+                const btn = document.getElementById(`btn-tab-${id}`);
+                const section = document.getElementById(`tab-${id}`);
+                if (id === tabId) {
+                    btn.classList.add('border-primary', 'text-slate-800', 'bg-slate-50');
+                    btn.classList.remove('border-transparent', 'text-slate-500');
+                    section.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('border-primary', 'text-slate-800', 'bg-slate-50');
+                    btn.classList.add('border-transparent', 'text-slate-500');
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Anchor scroll to force visibility
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabId === 'mapa') {
+                setTimeout(() => {
+                    initMap();
+                    getUserLocationOnMap(false);
+                }, 50);
+            }
+        }
+
+        // Haversine formula for strict geographical distance
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function parseToTotalMins(timeStr) {
+            const parts = timeStr.split(':');
+            let h = parseInt(parts[0]);
+            const m = parseInt(parts[1]);
+            if (h < 12) h += 24; // Handle 00:00 - 05:00 as next day for easy comparison
+            return (h * 60) + m;
+        }
+
+        function minsToTimeStr(totalMins) {
+            let h = Math.floor(totalMins / 60) % 24;
+            let m = totalMins % 60;
+            return String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
+        }
+
+        let chatWin;
+        
+        function resetAssistant() {
+            document.getElementById('ast-init-state').classList.remove('hidden');
+            document.getElementById('ast-chat-state').classList.add('hidden');
+            document.getElementById('chat-window').innerHTML = '';
+            currentUserState = { lat: null, lng: null, route: null, closestStop: null, prevControlStop: null };
+        }
+
+        function addMessage(sender, htmlContent, isTyping = false) {
+            if (!chatWin) chatWin = document.getElementById('chat-window');
+            
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} animate-slide-up mb-2 w-full`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = sender === 'user' 
+                ? 'bg-primary text-white p-3 rounded-2xl rounded-tr-sm max-w-[85%] shadow-sm' 
+                : 'bg-white border border-slate-200 text-slate-700 p-3 rounded-2xl rounded-tl-sm w-full max-w-[95%] text-[13px] leading-relaxed shadow-sm relative';
+            
+            msgDiv.appendChild(bubble);
+            chatWin.appendChild(msgDiv);
+            
+            // Auto-scroll to latest message
+            setTimeout(() => { chatWin.scrollTo({ top: chatWin.scrollHeight, behavior: 'smooth' }); }, 10);
+
+            if (isTyping) {
+                bubble.innerHTML = '';
+                const typeInterval = setInterval(() => {
+                    bubble.innerHTML = htmlContent + '<span class="cursor-blink"></span>';
+                    clearInterval(typeInterval);
+                    setTimeout(() => { 
+                        bubble.innerHTML = htmlContent; 
+                        chatWin.scrollTo({ top: chatWin.scrollHeight, behavior: 'smooth' });
+                    }, 500);
+                }, 400); 
+            } else {
+                bubble.innerHTML = htmlContent;
+            }
+        }
+
+        // Helper to generate dynamic buttons and avoid repeating the exact same question
+        function getBotOptionsHtml(excludeOption, route) {
+            const options = [
+                { id: 'altres_parades', text: 'Quines altres opcions de parada tinc?' },
+                { id: 'altres_hores', text: 'A quines altres hores passa?' },
+                { id: 'recinte', text: 'Vull anar al recinte de concerts' },
+                { id: 'preu', text: 'S\'ha de pagar per pujar al bus?' },
+                { id: 'ubicacio', text: 'Com funcioneu amb la meva ubicació?' }
+            ];
+            
+            let html = `<div class="flex flex-col gap-2 mt-4 border-t border-slate-100 pt-3 animate-slide-up">
+                <span class="text-[10px] text-slate-400 font-bold uppercase mb-1">Pots preguntar-me:</span>`;
+                
+            options.forEach(opt => {
+                if (opt.id !== excludeOption) {
+                    html += `<button onclick="handleBotOption('${opt.id}', '${route}')" class="bg-primary/5 text-primary border border-primary/20 rounded-lg px-3 py-2 text-xs font-bold text-left hover:bg-primary/10 hover:shadow-sm transition-all w-full">${opt.text}</button>`;
+                }
+            });
+            
+            html += `</div>`;
+            return html;
+        }
+
+        function startAssistant(route) {
+            document.getElementById('ast-init-state').classList.add('hidden');
+            document.getElementById('ast-chat-state').classList.remove('hidden');
+            
+            // Scroll to the top of the chat area to force focus
+            document.getElementById('ast-chat-state').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            if(document.getElementById('chat-window').innerHTML.trim() === '') {
+                 const warningHTML = `
+                 <div class="bg-amber-50 border-l-4 border-amber-500 text-amber-900 p-3 rounded-r-xl shadow-sm text-[12px] leading-snug mb-3 animate-fade-in">
+                     <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-700">
+                         <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Avís de Responsabilitat
+                     </div>
+                     Soc un assistent virtual i puc cometre errors en el càlcul exacte.<br><br>
+                     ⚠️ Tingues en compte que aquest bot fa servir <strong>estimacions</strong>. Les hores mostrades en parades intermèdies no són completament exactes, poden variar segons el trànsit i altres factors (només les parades d'inici ho són).
+                 </div>
+                 Hola! Puc ajudar-te a planificar el teu trajecte.`;
+                 addMessage('bot', warningHTML);
+            }
+
+            addMessage('user', `Vull agafar la <strong>${route}</strong>.`);
+            
+            setTimeout(() => {
+                addMessage('bot', `Perfecte, estic buscant la teva ubicació per la ruta ${route}... <i class="fa-solid fa-spinner fa-spin ml-2"></i>`, true);
+                
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => processLocation(pos.coords.latitude, pos.coords.longitude, route),
+                        (err) => {
+                            let errHtml = `No he pogut accedir a la teva ubicació. Faré servir el centre de Molins (Plaça de la Creu).<br><br>
+                            Vols tornar a intentar pillar la teva ubicació? Assegura't que tinc permís!<br>
+                            <button onclick="startAssistant('${route}')" class="mt-3 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-bold transition-colors w-full shadow-sm hover:shadow-md">Tornar a provar ubicació</button>`;
+                            addMessage('bot', errHtml);
+                            processLocation(41.4110, 2.0180, route);
+                        }
+                    );
+                } else {
+                    processLocation(41.4110, 2.0180, route);
+                }
+            }, 600);
+        }
+
+        function processLocation(userLat, userLng, route) {
+            currentUserState.lat = userLat;
+            currentUserState.lng = userLng;
+            currentUserState.route = route;
+
+            const stops = route === 'MB1' ? MB1_STOPS : MB2_STOPS;
+            
+            // Find strictly closest stop
+            let closestStop = null;
+            let closestIndex = -1;
+            let minDistance = Infinity;
+
+            stops.forEach((stop, index) => {
+                const d = getDistance(userLat, userLng, stop.lat, stop.lng);
+                if (d < minDistance) {
+                    minDistance = d;
+                    closestStop = stop;
+                    closestIndex = index;
+                }
+            });
+            
+            currentUserState.closestStop = closestStop;
+
+            // Busca la parada de control anterior (con horario exacto asignado)
+            let prevControl = null;
+            for(let i = closestIndex; i >= 0; i--) {
+                if(stops[i].isControl) {
+                    prevControl = stops[i];
+                    break;
+                }
+            }
+            if(!prevControl) prevControl = stops[0]; // Fallback al principio
+            
+            currentUserState.prevControlStop = prevControl;
+
+            generatePlan(route, closestStop, minDistance, prevControl);
+        }
+
+        function generatePlan(route, currentStop, distance, prevControlStop) {
+            const now = new Date();
+            const currMins = parseToTotalMins(`${now.getHours()}:${now.getMinutes()}`);
+            const schedule = SCHEDULES[route];
+            
+            const isAvailable = checkServiceAvailability();
+            
+            let nextBaseTimeStr = null;
+            let nextBaseMins = Infinity;
+
+            if (isAvailable) {
+                for (let t of schedule) {
+                    const baseMins = parseToTotalMins(t);
+                    const stopTime = baseMins + (prevControlStop.offsetMins || 0);
+                    
+                    if (stopTime >= currMins) {
+                        nextBaseTimeStr = t;
+                        nextBaseMins = baseMins;
+                        break;
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                if (!isAvailable) {
+                    let endHtml = `📍 La teva parada més propera és <strong>${currentStop.name}</strong> (a uns ${Math.round(distance)}m).<br><br>🚨 <strong class="text-red-600">AVUI NO HI HA SERVEI</strong>.<br>Et recordo que els busos només passen la nit del Divendres 25, la nit del Dissabte 26 i la nit del Dilluns 28 (des de les 22:00h fins a les 06:00h de la matinada de l'endemà).`;
+                    endHtml += getBotOptionsHtml(null, route);
+                    addMessage('bot', endHtml);
+                    return;
+                }
+
+                if (!nextBaseTimeStr) {
+                    let endHtml = `📍 La teva parada més propera és <strong>${currentStop.name}</strong> (a uns ${Math.round(distance)}m).<br><br>😔 Sembla que ja no hi ha més busos previstos avui. El servei ha finalitzat.`;
+                    endHtml += getBotOptionsHtml(null, route);
+                    addMessage('bot', endHtml);
+                    return;
+                }
+
+                const timeAtPrevControl = minsToTimeStr(nextBaseMins + (prevControlStop.offsetMins || 0));
+                let responseHtml = `📍 La teva parada més propera és <strong>${currentStop.name}</strong> (a uns ${Math.round(distance)}m).<br><br>`;
+
+                if (currentStop.isControl) {
+                    if (currentStop.seq === 1) {
+                        responseHtml += `✅ Aquesta parada és d'inici! És 100% segur que el proper bus sortirà a les <strong class="text-white bg-primary px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong>.`;
+                    } else {
+                        responseHtml += `⚠️ Aquesta és una parada principal (de control). El bus hi passarà cap a les <strong class="text-white bg-amber-500 px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong> (<strong>Aproximació</strong>).`;
+                    }
+                } else {
+                    responseHtml += `ℹ️ Com que aquesta parada no té horari fix, he buscat la parada anterior amb horari (<strong>${prevControlStop.name}</strong>). Per allà passarà cap a les <strong class="text-white bg-amber-500 px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong>.<br><br>Si et quedes a la teva parada actual, arribarà poc després d'aquesta hora!`;
+                }
+
+                responseHtml += getBotOptionsHtml(null, route);
+
+                addMessage('bot', responseHtml, true);
+            }, 1000);
+        }
+
+        // Logic for Bot Buttons with Location Context
+        function handleBotOption(option, route) {
+            if (option === 'altres_parades') {
+                addMessage('user', `Quines altres opcions de parada tinc?`);
+                setTimeout(() => {
+                    let botResp = "";
+                    if (!currentUserState.lat || !currentUserState.lng) {
+                        botResp = `No tinc la teva ubicació exacta, et recomano revisar la pestanya de <strong>Mapa</strong> per veure tota la ruta visualment!`;
+                    } else {
+                        const stops = route === 'MB1' ? MB1_STOPS : MB2_STOPS;
+                        let distancesArr = stops.map(s => {
+                            return { ...s, dist: getDistance(currentUserState.lat, currentUserState.lng, s.lat, s.lng) };
+                        });
+                        
+                        distancesArr.sort((a, b) => a.dist - b.dist);
+                        
+                        let htmlList = `<ul class="list-disc pl-4 mt-2 space-y-1">`;
+                        for(let i=0; i<3 && i<distancesArr.length; i++) {
+                            htmlList += `<li><strong>${distancesArr[i].name}</strong> (a ${Math.round(distancesArr[i].dist)}m)</li>`;
+                        }
+                        htmlList += `</ul>`;
+
+                        botResp = `D'acord amb la teva ubicació real, les 3 parades de la <strong>${route}</strong> més properes a tu ara mateix són: ${htmlList}<br><br>Pots veure exactament on són a la pestanya <strong>Mapa</strong>.`;
+                    }
+                    botResp += getBotOptionsHtml('altres_parades', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            } 
+            else if (option === 'altres_hores') {
+                addMessage('user', `A quines altres hores passa?`);
+                setTimeout(() => {
+                    let botResp = "";
+                    const targetStop = currentUserState.closestStop?.isControl ? currentUserState.closestStop : currentUserState.prevControlStop;
+                    if(!targetStop) {
+                        botResp = `No he pogut calcular-ho amb exactitud. La <strong>${route}</strong> fa sortides a les: ${SCHEDULES[route].join(', ')}.`;
+                    } else {
+                        const times = SCHEDULES[route].map(t => {
+                            const total = parseToTotalMins(t) + (targetStop.offsetMins || 0);
+                            return minsToTimeStr(total);
+                        });
+
+                        botResp = `Calculant per la parada amb horari de referència més propera (<strong>${targetStop.name}</strong>), les hores previstes de pas per allà són: <br><br><strong>${times.join('h, ')}h</strong>.<br><br>Això és una estimació, arriba a la teva parada una mica abans!`;
+                    }
+                    botResp += getBotOptionsHtml('altres_hores', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            }
+            else if (option === 'recinte') {
+                addMessage('user', `Vull anar al recinte de concerts.`);
+                setTimeout(() => {
+                    let botResp = `Per anar a la zona de concerts (Parc del Llobregat / Pont de la Cadena), la parada que et deixa més a prop d'aquesta ruta és: <strong>Parc del Pont de la Cadena - Recinte</strong>.<br><br>Així que només has de pujar a la <strong>${route}</strong> i baixar en aquesta parada per gaudir de la festa! 🎶`;
+                    botResp += getBotOptionsHtml('recinte', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            }
+            else if (option === 'preu') {
+                addMessage('user', `S'ha de pagar per pujar al bus?`);
+                setTimeout(() => {
+                    let botResp = `Aquest servei és especial de la Festa Major. <strong>És completament gratuït</strong> durant tot l'horari de servei (de 22:00h a 06:00h). Puja i gaudeix de la festa sense preocupar-te! 🚌✨`;
+                    botResp += getBotOptionsHtml('preu', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            }
+            else if (option === 'ubicacio') {
+                addMessage('user', `Com funcioneu amb la meva ubicació?`);
+                setTimeout(() => {
+                    let botResp = `Quan m'ho demanes, utilitzo el GPS del teu telèfon (només si em dones permís) per trobar les coordenades exactes d'on ets. Llavors, comparo aquesta distància amb totes les parades de la ruta i et calculo l'estimació de temps exclusivament per a tu. <strong>No guardem cap dada, tot es calcula al moment!</strong> 🔒📍 FM APP No té servidors i no envia cap informació. FMAPP utilitza Github per allotjar la pàgina web`;
+                    botResp += getBotOptionsHtml('ubicacio', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            }
+        }
+
+        let map;
+        let markersLayer;
+        let userMarker = null;
+        let userCircle = null;
+
+        function initMap() {
+            if (map) { map.invalidateSize(); return; }
+
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([41.4115, 2.0190], 15);
+            
+            // Light base layer to match the new theme
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+            renderMap('all');
+        }
+
+        // Funció per obtenir i posicionar la ubicació de l'usuari al mapa
+        function getUserLocationOnMap(centerMap = false) {
+            if (!map) return;
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const userLat = pos.coords.latitude;
+                        const userLng = pos.coords.longitude;
+
+                        // Desa les coordenades al estado global
+                        currentUserState.lat = userLat;
+                        currentUserState.lng = userLng;
+
+                        // Esborra ubicació anterior si existia
+                        if (userMarker) map.removeLayer(userMarker);
+                        if (userCircle) map.removeLayer(userCircle);
+
+                        // Icona personalitzada per a l'usuari
+                        const userIcon = L.divIcon({
+                            className: 'custom-user-marker',
+                            html: '<div class="user-ping"></div><div class="user-dot"></div>',
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
+
+                        // Cercle de precisió
+                        userCircle = L.circle([userLat, userLng], {
+                            radius: pos.coords.accuracy || 30,
+                            color: '#2563eb',
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.15,
+                            weight: 1
+                        }).addTo(map);
+
+                        // Marcador de l'usuari
+                        userMarker = L.marker([userLat, userLng], { icon: userIcon, zIndexOffset: 1000 })
+                            .bindPopup(`
+                                <div class="p-1 animate-slide-up text-center">
+                                    <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200">Tu</span>
+                                    <h4 class="text-xs font-bold text-slate-800 mt-1"><i class="fa-solid fa-location-dot text-blue-600 mr-1"></i>Ets aquí</h4>
+                                </div>
+                            `)
+                            .addTo(map);
+
+                        if (centerMap) {
+                            map.setView([userLat, userLng], 16, { animate: true });
+                            userMarker.openPopup();
+                        }
+                    },
+                    (err) => {
+                        console.log("No s'ha pogut obtenir la ubicació al mapa:", err);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            }
+        }
+
+        function filterMap(type) {
+            document.querySelectorAll('#tab-mapa button').forEach(b => {
+                b.classList.remove('bg-white', 'text-sky-600', 'text-emerald-600');
+                if(b.id === 'filter-all') b.classList.add('bg-slate-100', 'text-slate-600');
+                else if(b.id === 'filter-mb1' || b.id === 'filter-mb2') b.classList.add('bg-slate-100', 'text-slate-400');
+            });
+            
+            const btn = document.getElementById(`filter-${type}`);
+            if (btn) {
+                btn.classList.remove('bg-slate-100', 'text-slate-400', 'text-slate-600');
+                btn.classList.add('bg-white');
+                if(type === 'all') btn.classList.add('text-slate-800');
+                if(type === 'mb1') btn.classList.add('text-sky-600');
+                if(type === 'mb2') btn.classList.add('text-emerald-600');
+            }
+
+            renderMap(type);
+        }
+
+        function renderMap(filterType) {
+            if (!markersLayer) return;
+            markersLayer.clearLayers();
+
+            // Coordinate Grouping Dictionary
+            // Format: "lat.toFixed(4),lng.toFixed(4)" -> Array of Stops
+            const groupedStops = {};
+
+            const addStops = (stops, routeLabel) => {
+                stops.forEach(stop => {
+                    // Filter out cancelled stops entirely from map
+                    if (stop.name.toLowerCase().includes('anulada') || stop.name.toLowerCase().includes('anul·lada')) {
+                        return;
+                    }
+                    
+                    // Create stable key strictly by coordinates to group them
+                    const key = `${stop.lat.toFixed(4)},${stop.lng.toFixed(4)}`;
+                    if (!groupedStops[key]) groupedStops[key] = [];
+                    groupedStops[key].push({ ...stop, route: routeLabel });
+                });
+            };
+
+            if (filterType === 'all' || filterType === 'mb1') addStops(MB1_STOPS, 'MB1');
+            if (filterType === 'all' || filterType === 'mb2') addStops(MB2_STOPS, 'MB2');
+
+            // Draw Markers (NO POLYLINES, STRICTLY AS REQUESTED)
+            Object.values(groupedStops).forEach(stopGroup => {
+                const lat = stopGroup[0].lat;
+                const lng = stopGroup[0].lng;
+                
+                // Determine color class
+                const hasMB1 = stopGroup.some(s => s.route === 'MB1');
+                const hasMB2 = stopGroup.some(s => s.route === 'MB2');
+                let markerClass = 'custom-bus-marker animate-fade-in ';
+                if (hasMB1 && hasMB2) markerClass += 'marker-mixed';
+                else if (hasMB1) markerClass += 'marker-mb1';
+                else markerClass += 'marker-mb2';
+
+                // Icons only, no numbers
+                const icon = L.divIcon({
+                    className: markerClass,
+                    html: '<i class="fa-solid fa-bus"></i>',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                // Build Popup Content dynamically based on stops grouped here
+                let popupHtml = `<div class="p-1 space-y-2 min-w-[150px] animate-slide-up">`;
+                stopGroup.forEach(s => {
+                    const badgeColor = s.route === 'MB1' ? 'bg-sky-100 text-sky-700 border border-sky-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+                    popupHtml += `
+                        <div class="border-b border-slate-100 pb-2 last:border-0 last:pb-0">
+                            <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${badgeColor}">${s.route}</span>
+                            <h4 class="text-xs font-bold text-slate-800 mt-1">${s.name}</h4>
+                            ${s.isControl ? `<span class="text-[9px] text-amber-600 mt-1 block"><i class="fa-solid fa-clock mr-1"></i>Parada de Control</span>` : ''}
+                        </div>
+                    `;
+                });
+                popupHtml += `</div>`;
+
+                L.marker([lat, lng], { icon: icon })
+                 .bindPopup(popupHtml)
+                 .addTo(markersLayer);
+            });
+        }
+    </script>
+</body>
+</html>
