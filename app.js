@@ -474,6 +474,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
         // Botons Ticket / RSVP / Entrades
         const ticketBtn = document.getElementById('modal-ticket-btn');
         const rsvpBtn = document.getElementById('modal-rsvp-btn');
+        const hoursBtn = document.getElementById('modal-hours-btn');
+
         
         const ticketUrl = acte.ticket || acte.entrades;
         if (ticketUrl && ticketUrl.trim() !== "") {
@@ -488,6 +490,13 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_
             rsvpBtn.style.display = 'flex';
         } else {
             rsvpBtn.style.display = 'none';
+        }
+
+         if (acte.hours && acte.hours.trim() !== "") {
+            hoursBtn.href = acte.hours;
+            hoursBtn.style.display = 'flex';
+        } else {
+            hoursBtn.style.display = 'none';
         }
 
         const favBtn = document.getElementById('modal-fav-btn');
