@@ -853,7 +853,7 @@
             map = L.map('map', { zoomControl: false, attributionControl: false }).setView([41.4115, 2.0190], 15);
             
             // Light base layer to match the new theme
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=cb1_2y94_1_3099e19ace5b1c182798b317', {
                 maxZoom: 19
             }).addTo(map);
 
