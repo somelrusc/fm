@@ -485,7 +485,7 @@
                             found = true;
                             break;
                         } else if (currMins >= baseMins && currMins < baseMins + 30) {
-                            status = `En ruta (Sortida ${t}h)`;
+                            status = `En ruta (Ha sortit a les ${t}h)`;
                             statusClass = "text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded animate-pulse-soft inline-block";
                             found = true;
                             break;
@@ -747,9 +747,9 @@
 
                 if (currentStop.isControl) {
                     if (currentStop.seq === 1) {
-                        responseHtml += `✅ Aquesta parada és d'inici! És 100% segur que el proper bus sortirà a les <strong class="text-white bg-primary px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong>.`;
+                        responseHtml += `✅ Aquesta parada és d'inici! Segons l'horari, el proper bus sortirà a les <strong class="text-white bg-primary px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong>.`;
                     } else {
-                        responseHtml += `⚠️ Aquesta és una parada principal (de control). El bus hi passarà cap a les <strong class="text-white bg-amber-500 px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong> (<strong>Aproximació</strong>).`;
+                        responseHtml += `⚠️ Aquesta és una parada de control. Segons la nostra aproximació, el bus hi passarà cap a les <strong class="text-white bg-amber-500 px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong> (<strong>Aproximació</strong>).`;
                     }
                 } else {
                     responseHtml += `ℹ️ Com que aquesta parada no té horari fix, he buscat la parada anterior amb horari (<strong>${prevControlStop.name}</strong>). Per allà passarà cap a les <strong class="text-white bg-amber-500 px-2 py-0.5 rounded text-base inline-block shadow-sm">${timeAtPrevControl}h</strong>.<br><br>Si et quedes a la teva parada actual, arribarà poc després d'aquesta hora!`;
@@ -811,7 +811,7 @@
             else if (option === 'recinte') {
                 addMessage('user', `Vull anar al recinte de concerts.`);
                 setTimeout(() => {
-                    let botResp = `Per anar a la zona de concerts (Parc del Llobregat / Pont de la Cadena), la parada que et deixa més a prop d'aquesta ruta és: <strong>Parc del Pont de la Cadena - Recinte</strong>.<br><br>Així que només has de pujar a la <strong>${route}</strong> i baixar en aquesta parada per gaudir de la festa! 🎶`;
+                    let botResp = `Per anar a la zona de concerts (Parc del Llobregat), la parada que et deixa més a prop d'aquesta ruta és: <strong>Parc del Pont de la Cadena - Recinte de Concerts del Parc del Llobregat</strong>.<br><br>Així que només has de pujar a la <strong>${route}</strong> i baixar en aquesta parada per gaudir de la festa! 🎶`;
                     botResp += getBotOptionsHtml('recinte', route);
                     addMessage('bot', botResp, true);
                 }, 500);
