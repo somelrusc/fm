@@ -155,6 +155,7 @@ body { background-color: var(--bg-main); color: var(--text-main); overflow: hidd
 .modal-action-btn { flex: 1; min-width: 120px; padding: 14px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;}
 .ticket-btn-action { background: #10b981; color: white; flex-basis: 100%; text-decoration: none; }
 .rsvp-btn-action { background: #2563eb; color: white; flex-basis: 100%; text-decoration: none; }
+.hours-btn-action { background: #b9034b; color: white; flex-basis: 100%; text-decoration: none; }
 .fav-btn-action { background: #fce4ec; color: var(--primary); }
 .nav-btn-action { background: #f8fafc; border: 1px solid var(--border); color: var(--text-main); }
 
