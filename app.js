@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const guardiaUrbana = { titol: "Guàrdia Urbana", lloc: "Carrer Josep Maria Llopis, 1", lat: 41.41177157926289, lng: 2.0160465752029455 };
 
     const map = L.map('map', { zoomControl: false }).setView([41.4136, 2.0163], 15);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?api_key=cb1_2y94_1_3099e19ace5b1c182798b317', { maxZoom: 19 }).addTo(map);    const mapGroup = L.layerGroup().addTo(map);
+    L.tileLayer('https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?key=cb1_2y94_1_3099e19ace5b1c182798b317', { maxZoom: 19 }).addTo(map);
+    const mapGroup = L.layerGroup().addTo(map);
     const lilaGroup = L.layerGroup().addTo(map);
 
     let userMarker = null;
