@@ -388,7 +388,7 @@
             { seq: 2,  name: "Av. Barcelona - Riera Bonet", lat: 41.404653, lng: 2.025642, isControl: false },
             { seq: 3,  name: "Av. Barcelona", lat: 41.406791, lng: 2.023218, isControl: false },
             { seq: 4,  name: "Canal de la Infanta", lat: 41.407384, lng: 2.021491, isControl: false },
-            { seq: 5,  name: "Parc del Pont de la Cadena - Recinte", lat: 41.408580, lng: 2.018759, isControl: false },
+            { seq: 5,  name: "Parc del Pont de la Cadena - Recinte de Concerts del Parc del Llobregat", lat: 41.408580, lng: 2.018759, isControl: false },
             { seq: 6,  name: "Av. Valencia Pg. Pi i Maragall", lat: 41.409886, lng: 2.018577, isControl: true, offsetMins: 7 },
             { seq: 7,  name: "Nova Parada Temporal", lat: 41.410034, lng: 2.015317, isControl: false },
             { seq: 8,  name: "Rbla de la Granja", lat: 41.415837, lng: 2.012403, isControl: false },
@@ -424,7 +424,7 @@
             { seq: 13, name: "CAP - Ambulatori", lat: 41.418386, lng: 2.013257, isControl: true, offsetMins: 12 },
             { seq: 14, name: "Sínies", lat: 41.417826, lng: 2.011647, isControl: false },
             { seq: 15, name: "Rbla de la Granja", lat: 41.415710, lng: 2.012334, isControl: false },
-            { seq: 16, name: "Parc del Pont de la Cadena - Recinte", lat: 41.407806, lng: 2.018637, isControl: false },
+            { seq: 16, name: "Parc del Pont de la Cadena - Recinte de Concerts del Parc del Llobregat", lat: 41.407806, lng: 2.018637, isControl: false },
             { seq: 17, name: "Felip Canalias", lat: 41.405185, lng: 2.019698, isControl: false },
             { seq: 18, name: "Francesc Layret", lat: 41.404956, lng: 2.023266, isControl: false },
             { seq: 19, name: "Llobregat - Av. Barcelona", lat: 41.404111, lng: 2.025833, isControl: false },
@@ -452,11 +452,11 @@
             const h = now.getHours();
             
             // Viernes 25 a Sabado 26 (22:00 - 06:00)
-            const night1 = (d === 25 && h >= 22) || (d === 26 && h < 6);
+            const night1 = (d === 25 && h >= 6) || (d === 26 && h < 6);
             // Sabado 26 a Domingo 27 (22:00 - 06:00)
-            const night2 = (d === 26 && h >= 22) || (d === 27 && h < 6);
+            const night2 = (d === 26 && h >= 6) || (d === 27 && h < 6);
             // Lunes 28 a Martes 29 (22:00 - 06:00)
-            const night3 = (d === 28 && h >= 22) || (d === 29 && h < 6);
+            const night3 = (d === 28 && h >= 6) || (d === 29 && h < 6);
             
             return night1 || night2 || night3;
         }
@@ -475,18 +475,25 @@
                     status = "Avui no hi ha servei";
                     statusClass = "text-red-700 font-extrabold bg-red-100 border border-red-200 px-2 py-1 rounded animate-pulse-soft inline-block uppercase";
                 } else {
+                    let found = false;
                     for (let t of SCHEDULES[route]) {
                         let baseMins = parseToTotalMins(t);
                         
                         if (currMins < baseMins) {
                             status = `Proper bus: ${t}h`;
                             statusClass = "text-primary font-bold bg-primary/10 px-2 py-1 rounded animate-pulse-soft inline-block";
+                            found = true;
                             break;
                         } else if (currMins >= baseMins && currMins < baseMins + 30) {
                             status = `En ruta (Sortida ${t}h)`;
                             statusClass = "text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded animate-pulse-soft inline-block";
+                            found = true;
                             break;
                         }
+                    }
+                    if (!found) {
+                        status = `Proper bus: ${SCHEDULES[route][0]}h`;
+                        statusClass = "text-primary font-bold bg-primary/10 px-2 py-1 rounded animate-pulse-soft inline-block";
                     }
                 }
                 document.getElementById(`status-${route.toLowerCase()}`).innerHTML = `<span class="${statusClass}">${status}</span>`;
@@ -542,7 +549,7 @@
             const parts = timeStr.split(':');
             let h = parseInt(parts[0]);
             const m = parseInt(parts[1]);
-            if (h < 12) h += 24; // Handle 00:00 - 05:00 as next day for easy comparison
+            if (h < 6) h += 24; // Handle 00:00 - 05:00 as next day for easy comparison
             return (h * 60) + m;
         }
 
@@ -600,7 +607,8 @@
                 { id: 'altres_hores', text: 'A quines altres hores passa?' },
                 { id: 'recinte', text: 'Vull anar al recinte de concerts' },
                 { id: 'preu', text: 'S\'ha de pagar per pujar al bus?' },
-                { id: 'ubicacio', text: 'Com funcioneu amb la meva ubicació?' }
+                { id: 'ubicacio', text: 'Com funcioneu amb la meva ubicació?' },
+                { id: 'safety', text: 'Els horaris són 100% segurs?' }
             ];
             
             let html = `<div class="flex flex-col gap-2 mt-4 border-t border-slate-100 pt-3 animate-slide-up">
@@ -820,6 +828,14 @@
                 addMessage('user', `Com funcioneu amb la meva ubicació?`);
                 setTimeout(() => {
                     let botResp = `Quan m'ho demanes, utilitzo el GPS del teu telèfon (només si em dones permís) per trobar les coordenades exactes d'on ets. Llavors, comparo aquesta distància amb totes les parades de la ruta i et calculo l'estimació de temps exclusivament per a tu. <strong>No guardem cap dada, tot es calcula al moment!</strong> 🔒📍 FM APP No té servidors i no envia cap informació. FMAPP utilitza Github per allotjar la pàgina web`;
+                    botResp += getBotOptionsHtml('ubicacio', route);
+                    addMessage('bot', botResp, true);
+                }, 500);
+            }
+            else if (option === 'safety') {
+                addMessage('user', `Els horaris són 100% segurs?`);
+                setTimeout(() => {
+                    let botResp = `No! Recorda que FMAPP i FMBOT (Beta) no tenen accés en directe al GPS del bus així que els horaris poden estar malament i són un càlcul propi aproximat amb dades que ens arriben i tenim. Així que FMAPP pot cometre errors i no t'has de fiar al 100% del seu xatbot. Et recomanem que utilitzis el sentit comú i entenguis que podem cometre errors.`;
                     botResp += getBotOptionsHtml('ubicacio', route);
                     addMessage('bot', botResp, true);
                 }, 500);
