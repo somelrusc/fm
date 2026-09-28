@@ -495,6 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
         }
+        
         const disclaimersEl = document.getElementById('modal-disclaimers');
         if (disclaimersEl) {
             disclaimersEl.innerHTML = disclaimersHtml;
@@ -505,6 +506,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const ticketBtn = document.getElementById('modal-ticket-btn');
         const rsvpBtn = document.getElementById('modal-rsvp-btn');
         const hoursBtn = document.getElementById('modal-hours-btn');
+        const infoBtn = document.getElementById('modal-info-btn');
+
 
         
         const ticketUrl = acte.ticket || acte.entrades;
@@ -527,6 +530,13 @@ document.addEventListener("DOMContentLoaded", () => {
             hoursBtn.style.display = 'flex';
         } else {
             hoursBtn.style.display = 'none';
+        }
+        
+         if (acte.info && acte.info.trim() !== "") {
+            infoBtn.href = acte.info;
+            infoBtn.style.display = 'flex';
+        } else {
+            infoBtn.style.display = 'none';
         }
 
         const favBtn = document.getElementById('modal-fav-btn');
