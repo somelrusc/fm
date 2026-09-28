@@ -9,6 +9,164 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
+
+    <!-- ESTILS AFEGITS PER A L'ALERTA TARONJA I MODALS -->
+    <style>
+        /* Ocultar l'antic banner de mobilitat sense eliminar el seu codi HTML */
+        #mobilitat-banner {
+            display: none !important;
+        }
+
+        /* NOU BANNER D'ALERTA TARONJA */
+        .alerta-naranja-banner {
+            background: linear-gradient(90deg, #ea580c, #c2410c);
+            color: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .alerta-naranja-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .alerta-naranja-icon {
+            font-size: 20px;
+            color: #fef08a;
+            animation: pulse-alert 2s infinite;
+        }
+
+        @keyframes pulse-alert {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .alerta-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            padding: 0 0 0 16px;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .alerta-close-btn:hover {
+            opacity: 1;
+        }
+
+        /* ESTILS MODAL POPUP I DETALLS */
+        .alerta-popup-card {
+            border-top: 6px solid #ea580c !important;
+        }
+
+        .alerta-badge-tag {
+            background: #ffedd5;
+            color: #c2410c;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            border: 1px solid #fed7aa;
+        }
+
+        .alerta-links-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .alerta-link-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+        .alerta-link-card:hover {
+            background: #fff7ed;
+            border-color: #fdba74;
+            transform: translateY(-2px);
+        }
+
+        .alerta-link-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .alerta-link-info {
+            flex: 1;
+        }
+
+        .alerta-link-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .alerta-link-sub {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .alerta-checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .alerta-checkbox-container input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #ea580c;
+        }
+
+        /* Ocultar l'embed del mapa de Meteocat */
+        .meteo-iframe-container {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -34,6 +192,17 @@
             <span>Consulta els horaris de busos i consells per a la mobilitat amb FMAPP</span>
         </div>
         <button onclick="document.getElementById('mobilitat-banner').style.display='none'" style="background: none; border: none; color: white; font-size: 18px; padding: 0 0 0 16px; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- NOU BANNER D'ALERTA TARONJA SUPERIOR -->
+    <div id="alerta-naranja-banner" class="alerta-naranja-banner">
+        <div onclick="openAlertaDetallsModal()" class="alerta-naranja-content">
+            <i class="fa-solid fa-triangle-exclamation alerta-naranja-icon"></i>
+            <span><strong>ALERTA TARONJA:</strong> Avui s'ha activat una alerta meteorològica per a dimarts 29 a les 00:00h. Podria afectar els actes. <u>Consulta detalls</u></span>
+        </div>
+        <button onclick="document.getElementById('alerta-naranja-banner').style.display='none'" class="alerta-close-btn" aria-label="Tancar avís">
             <i class="fa-solid fa-xmark"></i>
         </button>
     </div>
@@ -437,6 +606,191 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL POPUP D'ENTRADA (AVÍS ALERTA TARONJA) -->
+    <div class="modal-backdrop" id="alerta-entrance-modal" style="display: none; opacity: 0; pointer-events: none; visibility: hidden; z-index: 9999; background: rgba(0,0,0,0.6);">
+        <div class="modal-card alerta-popup-card">
+            <button class="modal-close-btn" onclick="closeAlertaEntranceModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="text-align: center; padding-top: 24px;">
+                <div class="alerta-badge-tag">
+                    <i class="fa-solid fa-cloud-showers-heavy"></i> ALERTA METEOROLÒGICA TARONJA
+                </div>
+                <h2 style="justify-content: center; font-size: 20px; margin-bottom: 12px; color: #9a3412;">
+                    Atenció: Alerta Activa a les 00:00h
+                </h2>
+                <p style="font-size: 14px; color: #334155; line-height: 1.5; margin-bottom: 16px;">
+                    S'ha activat una <strong>alerta meteorològica taronja a Molins de Rei</strong> que comença dimarts 29 a les <strong>00:00h</strong>. Aquesta situació podria afectar el desenvolupament dels actes de la Festa Major.
+                </p>
+                <div style="background: #fff7ed; border: 1px dashed #fdba74; padding: 12px; border-radius: 12px; font-size: 13px; color: #c2410c; margin-bottom: 20px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Us recomanem consultar la informació detallada i els canals oficials.
+                </div>
+                <div class="alerta-checkbox-container" onclick="toggleNoMostrarMesCheckbox()">
+                    <input type="checkbox" id="no-mostrar-alerta-cb" onclick="event.stopPropagation()">
+                    <label for="no-mostrar-alerta-cb" style="cursor: pointer; user-select: none;">No tornar a mostrar aquest avís</label>
+                </div>
+                <div class="modal-actions-row" style="margin-top: 16px;">
+                    <button class="modal-action-btn" onclick="openDetallsFromPopup()" style="background: linear-gradient(135deg, #ea580c, #c2410c); color: white; width: 100%; flex-basis: 100%;">
+                        <i class="fa-solid fa-circle-info"></i> Veure més informació
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLS ALERTA METEOROLÒGICA -->
+    <div class="modal-backdrop" id="alerta-detalls-modal" style="display: none; opacity: 0; pointer-events: none; visibility: hidden; z-index: 10000; background: rgba(0,0,0,0.6);">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeAlertaDetallsModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" style="padding-top: 24px;">
+                <div class="alerta-badge-tag">
+                    <i class="fa-solid fa-triangle-exclamation"></i> AVÍS METEOROLÒGIC MOLINS DE REI
+                </div>
+                <h2 style="font-size: 22px; color: #0f172a; margin-bottom: 6px;">
+                    Alerta Meteorològica Taronja
+                </h2>
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">
+                    Inici de l'alerta: <strong>Dimarts 29 a les 00:00h</strong>
+                </p>
+
+                <div style="background: #fff7ed; border-left: 4px solid #ea580c; padding: 14px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #9a3412; line-height: 1.5;">
+                    <strong style="display: block; margin-bottom: 4px; font-size: 14px;"><i class="fa-solid fa-triangle-exclamation"></i> Afectació als Actes de la Festa Major</strong>
+                    S'ha activat una alerta meteorològica taronja a Molins de Rei que podria afectar la celebració dels actes. Consulteu l'estat del temps i els canals oficials abans d'assistir.
+                </div>
+
+                <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-cloud-sun-rain" style="color: #ea580c;"></i> Informació sobre l'alerta
+                </h3>
+
+                <!-- Contenidor de l'embed d'iframe ocultat per CSS -->
+                <div class="meteo-iframe-container">
+                    <iframe src="https://static-m.meteo.cat/ginys/mapaAvisos" title="Mapa d'Avisos Meteocat"></iframe>
+                </div>
+
+                <a href="https://static-m.meteo.cat/ginys/mapaAvisos" target="_blank" class="alerta-link-card" style="margin-top: 10px;">
+                    <div class="alerta-link-icon" style="background: #e0f2fe; color: #0284c7;">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
+                    <div class="alerta-link-info">
+                        <div class="alerta-link-title">Meteocat - Mapa d'Avisos <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i></div>
+                        <div class="alerta-link-sub">Consulta el mapa d'avisos meteorològics en temps real</div>
+                    </div>
+                </a>
+                <a href="https://govern.cat/salapremsa/notes-premsa/872780/proteccio-civil-activa-lalerta-del-pla-inuncat-pluges-que-superar-40-lm-30-minuts" target="_blank" class="alerta-link-card" style="margin-top: 10px;">
+                    <div class="alerta-link-icon" style="background: #e0f2fe; color: #0284c7;">
+                        <i class="fa-solid fa-newspaper"></i>
+                    </div>
+                    <div class="alerta-link-info">
+                        <div class="alerta-link-title">Nota Informativa Generalitat de Catalunya<i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i></div>
+                        <div class="alerta-link-sub">Consulta la informació proporcionada per la Generalitat</div>
+                    </div>
+                </a>
+
+                <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 24px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-bullhorn" style="color: #ea580c;"></i> Canals Oficials d'Informació
+                </h3>
+
+                <div class="alerta-links-grid">
+                    <a href="https://x.com/emergenciescat" target="_blank" class="alerta-link-card">
+                        <div class="alerta-link-icon" style="background: #fef3c7; color: #d97706;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div class="alerta-link-info">
+                            <div class="alerta-link-title">Twitter Protecció Civil <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i></div>
+                            <div class="alerta-link-sub">Avisos d'emergències i consells de seguretat</div>
+                        </div>
+                    </a>
+
+                    <a href="https://instagram.com/ajuntamentmolinsderei" target="_blank" class="alerta-link-card">
+                        <div class="alerta-link-icon" style="background: #fce7f3; color: #db2777;">
+                            <i class="fa-brands fa-instagram"></i>
+                        </div>
+                        <div class="alerta-link-info">
+                            <div class="alerta-link-title">Instagram Ajuntament de Molins <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i></div>
+                            <div class="alerta-link-sub">Actualitzacions i comunicats municipals</div>
+                        </div>
+                    </a>
+
+                    <a href="https://molinsderei.cat/festamajor" target="_blank" class="alerta-link-card">
+                        <div class="alerta-link-icon" style="background: #dbeafe; color: #2563eb;">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div class="alerta-link-info">
+                            <div class="alerta-link-title">Pàgina Web Ajuntament (amb fe d'errates) <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 11px;"></i></div>
+                            <div class="alerta-link-sub">Programa i informació oficial a molinsderei.cat/festamajor</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONTROL DELS MODALS -->
+    <script>
+        function openAlertaDetallsModal() {
+            var modal = document.getElementById('alerta-detalls-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+                modal.style.pointerEvents = 'auto';
+                modal.classList.add('active');
+            }
+        }
+
+        function closeAlertaDetallsModal() {
+            var modal = document.getElementById('alerta-detalls-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                modal.style.pointerEvents = 'none';
+                modal.classList.remove('active');
+            }
+        }
+
+        function closeAlertaEntranceModal() {
+            var cb = document.getElementById('no-mostrar-alerta-cb');
+            if (cb && cb.checked) {
+                localStorage.setItem('hideOrangeAlert', 'true');
+            }
+            var modal = document.getElementById('alerta-entrance-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                modal.style.pointerEvents = 'none';
+                modal.classList.remove('active');
+            }
+        }
+
+        function openDetallsFromPopup() {
+            closeAlertaEntranceModal();
+            setTimeout(function() {
+                openAlertaDetallsModal();
+            }, 100);
+        }
+
+        function toggleNoMostrarMesCheckbox() {
+            var cb = document.getElementById('no-mostrar-alerta-cb');
+            if (cb) {
+                cb.checked = !cb.checked;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var hideAlert = localStorage.getItem('hideOrangeAlert');
+            if (hideAlert !== 'true') {
+                var entranceModal = document.getElementById('alerta-entrance-modal');
+                if (entranceModal) {
+                    entranceModal.style.display = 'flex';
+                    entranceModal.style.opacity = '1';
+                    entranceModal.style.visibility = 'visible';
+                    entranceModal.style.pointerEvents = 'auto';
+                    entranceModal.classList.add('active');
+                }
+            }
+        });
+    </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="events.js"></script>
