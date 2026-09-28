@@ -415,7 +415,7 @@ const actesData = [
     "lat": 41.41168711409592,
     "lng": 2.0153204125386446,
     "org": "Foment Cultural i Artístic",
-    "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,
+    "fuego": false, "ruido": false, "aglom": false, "acc": false, "familia": false, "infantil": false,"cancelled": true,
     "img": "",
     "desc": "Un espectacle d’animació amb música variada dels anys 80, 90 i més acompanyat d’un DJ. Vine a ballar i gaudir de la música que va marcar dues dècades!"
   },
@@ -867,7 +867,7 @@ const actesData = [
    "lat": 41.40580874727223,
     "lng": 2.0181858465558715,
     "org": "Cultura Molins",
-    "fuego": false, "ruido": true, "aglom": true, "acc": true, "familia": false, "infantil": false,
+    "fuego": false, "ruido": true, "aglom": true, "acc": true, "familia": false, "infantil": false,"cancelled": true,
     "img": "",
     "desc": "HORES NO OFICIALS. HORARI POT CANVIAR - Tancament del Recinte a les 4:00"
   },
@@ -1608,7 +1608,7 @@ const actesData = [
   },
    {
     "id": 86,
-    "titol": "Vermut Musical de Sant Miquel a la Pista de la Peni",
+    "titol": "Vermut Musical de Sant Miquel a la Pista de la Peni - CANCEL·LAT",
     "lloc": "Pati de la Peni",
    "diaKey": "dimarts_29",
     "diaNom": "Dimarts 29 de Setembre",
@@ -1616,14 +1616,15 @@ const actesData = [
     "horaInici": "12:00",
     "horaFi": "14:00",
     "categoria": "Vermut",
-    "icona": "fa-wine-glass",
-    "color": "#ff007b",
+    "icona": "fa-triangle-exclamation",
+    "color": "#ff0000",
    "lat": 41.4128388657654,
     "lng": 2.0195345668894986,
     "org": "Joventut Catòlica – La Peni",
-    "fuego": false, "ruido": true, "aglom": false, "acc": false, "familia": false, "infantil": false,
+    "fuego": false, "ruido": true, "aglom": false, "acc": false, "familia": false, "infantil": false,"cancelled" : true,
+
     "img": "",
-    "desc": "Tradicional vermut a la pista d’accés lliure i amb servei de bar i música en directe."
+    "desc": "Tradicional vermut a la pista d’accés lliure i amb servei de bar i música en directe.",
   },
      {
     "id": 87,
@@ -1653,7 +1654,7 @@ const actesData = [
     "horaInici": "12:30",
     "categoria": "Sant Miquel",
     "icona": "fa-triangle-exclamation",
-    "color": "#ff0073",
+    "color": "#ffe600",
     "lat": 41.41288155267572,
     "lng": 2.0180273428799977,
     "org": "Els Miquels de Molins de Rei",
