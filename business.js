@@ -98,5 +98,17 @@ const organizersData = {
         verifiedDesc: "Servei de l'aplicació FMAPP",
         ig: "https://www.instagram.com/somelrusc/",
         desc: "Departament de Mobilitat de la FMAPP. Consulta els horaris del transport a l'apartat mobiltitat o a 'Reservar'",
+        linkedOrgs: ["FMAPP"]
+
+    },
+    "FMAPP": { 
+        img: "", 
+        verified: true, 
+        badgeType: "",
+        verifiedDesc: "Servei de l'aplicació FMAPP",
+        ig: "https://www.instagram.com/somelrusc/",
+        desc: "FMAPP Profile",
+        linkedOrgs: ["Mobilitat - FMAPP"]
+
     },
 };
