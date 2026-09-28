@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getEventStatus(acte) {
+        if (acte && acte.cancelled) return 'other';
         const now = new Date();
         const start = parseDateTime(acte.dataIso, acte.horaInici);
         
@@ -93,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getUpcomingEvents(actesList) {
         const now = new Date();
-        return actesList.filter(a => parseDateTime(a.dataIso, a.horaInici) > now)
+        return actesList.filter(a => !a.cancelled && parseDateTime(a.dataIso, a.horaInici) > now)
                         .sort((a, b) => parseDateTime(a.dataIso, a.horaInici) - parseDateTime(b.dataIso, b.horaInici));
     }
 
@@ -143,6 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'now') statusBadge = '<span class="badge badge-now"><i class="fa-solid fa-bolt"></i> Ara</span>';
         else if (status === 'soon') statusBadge = '<span class="badge badge-soon"><i class="fa-solid fa-stopwatch"></i> Aviat</span>';
         else if (isFinished) statusBadge = '<span class="badge" style="background-color: #64748b; color: #ffffff;"><i class="fa-solid fa-flag-checkered"></i> Finalitzat</span>';
+        if (acte.cancelled) statusBadge = '<span class="badge" style="background-color: #ef4444; color: #ffffff;"><i class="fa-solid fa-ban"></i> CANCEL·LAT</span>';
 
         const linkedBadge = isLinked 
             ? `<span class="badge badge-linked">${acte.org}</span>` 
@@ -158,13 +160,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        const cardStyle = isFinished ? 'style="opacity: 0.6; filter: grayscale(30%);"' : '';
+        let cardStyle = '';
+        if (acte.cancelled) {
+            cardStyle = 'style="opacity: 0.5; filter: grayscale(100%); position: relative; overflow: hidden;"';
+        } else if (isFinished) {
+            cardStyle = 'style="opacity: 0.6; filter: grayscale(30%);"';
+        }
+        
+        let diagonalOverlay = acte.cancelled ? `<div style="position: absolute; top: 50%; left: -20%; width: 140%; height: 5px; background-color: rgba(239, 68, 68, 0.8); transform: translateY(-50%) rotate(-15deg); z-index: 10; pointer-events: none; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>` : '';
 
         return `
             <div class="event-card" ${cardStyle} onclick="openModalById(${acte.id})">
+                ${diagonalOverlay}
                 <div class="event-card-img-wrapper">${imgBlock}</div>
                 <div class="event-card-info">
-                    <h4>${acte.titol}</h4>
+                    <h4>${acte.cancelled ? `<span style="text-decoration: line-through; color: #ef4444;">${acte.titol}</span>` : acte.titol}</h4>
                     <div class="meta-row">
                         <span class="time-place-text"><i class="fa-solid fa-clock"></i> ${acte.horaInici}h</span>
                         ${distTag}
@@ -366,13 +376,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (isFinished) {
                     statusBadge = '<span class="badge" style="background-color: #64748b; color: #ffffff; font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-flag-checkered"></i> Finalitzat</span>';
                 }
+                if (a.cancelled) statusBadge = '<span class="badge" style="background-color: #ef4444; color: #ffffff; font-size: 10px; padding: 2px 6px;"><i class="fa-solid fa-ban"></i> CANCEL·LAT</span>';
                 
-                const itemStyle = isFinished ? 'style="opacity: 0.6; filter: grayscale(30%);"' : '';
+                let itemStyle = '';
+                if (a.cancelled) {
+                    itemStyle = 'style="opacity: 0.5; filter: grayscale(100%); position: relative; overflow: hidden;"';
+                } else if (isFinished) {
+                    itemStyle = 'style="opacity: 0.6; filter: grayscale(30%);"';
+                }
+
+                let diagonalOverlay = a.cancelled ? `<div style="position: absolute; top: 50%; left: -10%; width: 120%; height: 3px; background-color: rgba(239, 68, 68, 0.8); transform: translateY(-50%) rotate(-5deg); z-index: 10; pointer-events: none;"></div>` : '';
 
                 html += `<div class="multi-event-item" ${itemStyle} onclick="openModalById(${a.id})">
+                    ${diagonalOverlay}
                     <div class="multi-event-icon" style="background:${a.color}"><i class="fa-solid ${a.icona}"></i></div>
                     <div>
-                        <h4 style="font-size:14px; font-weight:800; margin:0;">${a.titol}</h4>
+                        <h4 style="font-size:14px; font-weight:800; margin:0;">${a.cancelled ? `<span style="text-decoration: line-through; color: #ef4444;">${a.titol}</span>` : a.titol}</h4>
                         <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
                             <span style="font-size:12px; color:#64748b;"><i class="fa-solid fa-clock"></i> ${a.horaInici}h</span>
                             ${statusBadge}
@@ -411,8 +430,17 @@ document.addEventListener("DOMContentLoaded", () => {
             fallbackEl.innerHTML = `<i class="fa-solid ${acte.icona}"></i>`;
         }
 
+        if (acte.cancelled) {
+            document.getElementById('modal-title').innerHTML = `<span style="text-decoration: line-through; color: #ef4444;">${acte.titol}</span>`;
+            imgEl.style.filter = 'grayscale(100%)';
+            fallbackEl.style.filter = 'grayscale(100%)';
+        } else {
+            document.getElementById('modal-title').innerText = acte.titol;
+            imgEl.style.filter = 'none';
+            fallbackEl.style.filter = 'none';
+        }
+
         document.getElementById('modal-cat').innerText = acte.categoria;
-        document.getElementById('modal-title').innerText = acte.titol;
         
         const orgEl = document.getElementById('modal-org');
         orgEl.innerText = acte.org;
@@ -440,6 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (status === 'now') badges += `<span class="badge badge-now"><i class="fa-solid fa-bolt"></i> Passant Ara</span> `;
         else if (status === 'soon') badges += `<span class="badge badge-soon"><i class="fa-solid fa-stopwatch"></i> Comença Aviat</span> `;
         else if (isFinished) badges += `<span class="badge" style="background-color: #64748b; color: #ffffff;"><i class="fa-solid fa-flag-checkered"></i> Acte Finalitzat</span> `;
+        if (acte.cancelled) badges += `<span class="badge" style="background-color: #ef4444; color: #ffffff;"><i class="fa-solid fa-ban"></i> CANCEL·LAT</span> `;
 
         if (acte.fuego) badges += `<span class="badge badge-fire"><i class="fa-solid fa-fire"></i> Pirotècnia</span> `;
         if (acte.ruido) badges += `<span class="badge badge-noise"><i class="fa-solid fa-volume-high"></i> Soroll Elevat</span> `;
